@@ -65,17 +65,15 @@ function PlanHome() {
 
   return (
     <div className="container py-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <div>
-          <div className="text-muted small">План · {user.login}</div>
-          <div className="fw-semibold">{data.planName}</div>
-        </div>
-        <Link to="/plans" className="btn btn-sm btn-outline-secondary">
-          Сменить план
-        </Link>
+      <div className="fw-semibold mb-3">
+        {user.login}. План чтения: {data.planName}
       </div>
 
-      {data.today ? (
+      {!data.today && (
+        <div className="alert alert-info">На сегодня записей в плане нет.</div>
+      )}
+
+      {data.today && !data.todayRead && (
         <div
           className="card-soft p-3 mb-3 tap-card"
           role="button"
@@ -95,10 +93,6 @@ function PlanHome() {
             </div>
             <StatusBadge status={data.today.status} size={26} />
           </div>
-        </div>
-      ) : (
-        <div className="alert alert-info">
-          На сегодня записей в плане нет. Ближайшая — ниже.
         </div>
       )}
 
@@ -125,10 +119,10 @@ function PlanHome() {
         </div>
       )}
 
-      {data.past?.length > 0 && (
+      {data.readDays?.length > 0 && (
         <>
-          <div className="text-muted small mt-3 mb-2">Ранее — свежие сверху</div>
-          {[...data.past].reverse().slice(0, 10).map((d) => (
+          <div className="text-muted small mt-3 mb-2">прочитанные отрывки</div>
+          {data.readDays.map((d) => (
             <Row key={d.date} d={d} />
           ))}
         </>

@@ -69,14 +69,21 @@ readingRouter.get('/reading/today/:planId', requireAuth, (req, res) => {
   }));
   const today = todayLocal();
   const todayEntry = days.find((d) => d.date === today) || null;
-  const afterToday = days.filter((d) => d.date > today);
-  const upcoming = afterToday.slice(0, 7);
-  const past = days.filter((d) => d.date < today);
   const isRead = (d) => d.status === 'green' || d.status === 'blue';
+  const afterToday = days.filter((d) => d.date > today);
   // Первый непрочитанный отрывок ПОСЛЕ сегодняшнего (или ближайший, если всё прочитано).
   const nextUnread = afterToday.find((d) => !isRead(d)) || afterToday[0] || null;
+  // Прочитанные отрывки (включая сегодняшний, если прочитан), свежие сверху.
+  const readDays = days.filter(isRead).reverse().slice(0, 10);
 
-  res.json({ planId: plan.id, planName: plan.name, today: todayEntry, upcoming, past, nextUnread });
+  res.json({
+    planId: plan.id,
+    planName: plan.name,
+    today: todayEntry,
+    todayRead: todayEntry ? isRead(todayEntry) : false,
+    nextUnread,
+    readDays,
+  });
 });
 
 // Данные записи плана на дату: подпись, диапазоны, стихи, главный стих, порог, статус.
