@@ -1,0 +1,22 @@
+# Зависимости
+node_modules/
+*/node_modules/
+
+# Сборка клиента
+client/dist/
+
+# База данных и служебные файлы SQLite
+server/data/app.db
+server/data/app.db-wal
+server/data/app.db-shm
+
+# Сгенерированные иконки (пересоздаются командой npm run icons)
+client/public/icon-192.png
+client/public/icon-512.png
+client/public/maskable-512.png
+client/public/apple-touch-icon.png
+
+# Прочее
+.DS_Store
+*.log
+.env

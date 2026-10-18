@@ -1,0 +1,22 @@
+{
+  "name": "bible-app-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Сервер приложения совместного чтения Евангелий",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test",
+    "import-bible": "node scripts/import-bible.mjs",
+    "create-admin": "node scripts/create-admin.mjs"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2"
+  }
+}

@@ -1,0 +1,47 @@
+# Docker Compose для локального запуска приложения.
+#
+# Запуск:            docker compose up --build
+# Остановка:         docker compose down
+# Сброс базы:        docker compose down -v
+#
+# ВНИМАНИЕ: TEST_PLAN_START ниже — ВРЕМЕННО, только для тестирования.
+# Задана ФИКСИРОВАННАЯ дата (18 окт), чтобы «сегодня» было вторым днём плана
+# и прогресс не терялся. Раньше стояло `today` — оно пересчитывалось каждый день
+# и сдвигало весь план, из-за чего записи прошлых дней перестали совпадать с
+# датами плана. Для обычной работы уберите эту строку (даты возьмутся из plans.json).
+
+services:
+  app:
+    build: .
+    image: bible-app
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      SESSION_SECRET: ${SESSION_SECRET:-dev-insecure-change-me}
+      ADMIN_LOGIN: ${ADMIN_LOGIN:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Belgrade}
+      TEST_PLAN_START: ${TEST_PLAN_START:-2026-10-18}
+      # Доступ по обычному HTTP (локальная сеть, http://192.168.x.x): cookie без
+      # флага Secure, иначе браузер её отбрасывает и вход «теряется». За HTTPS
+      # поставьте COOKIE_SECURE=true.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    volumes:
+      - bible-data:/app/server/data
+    restart: unless-stopped
+
+  # Прогон автотестов:  docker compose run --rm test
+  test:
+    build:
+      context: .
+      target: server
+    image: bible-app-test
+    profiles: ["test"]
+    environment:
+      NODE_ENV: production
+    command: npm test
+    working_dir: /app/server
+
+volumes:
+  bible-data:
