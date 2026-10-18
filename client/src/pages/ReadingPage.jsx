@@ -121,7 +121,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
       <div className="reader-progress d-flex justify-content-between align-items-center">
         <span>
           {credited
-            ? 'Чтение зачтено'
+            ? 'Отрывок прочитан'
             : reachedEnd
               ? 'Дошли до конца. Ещё немного активного чтения — и зачтётся.'
               : 'Читайте: время накапливается, пока экран активен.'}
@@ -143,7 +143,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
       )}
 
       <p className="text-muted small mb-2">
-        Нажмите на стих, чтобы добавить заметку или скопировать текст.
+        Нажмите на стих, чтобы добавить заметку.
       </p>
 
       <div className="card-soft p-2 mb-4">
@@ -190,13 +190,6 @@ function Reader({ entry, status, setStatus, onChanged }) {
           );
         })}
       </div>
-
-      {credited && (
-        <div className="alert alert-success">
-          Запись зачтена.{' '}
-          {status === 'green' ? 'Вовремя — зелёная галочка.' : 'Позже — синяя галочка.'}
-        </div>
-      )}
 
       {actionVerse && (
         <ActionSheet
