@@ -1,6 +1,40 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '../api.js';
 import { formatTime } from '../dates.js';
+
+// Текст заметки: по умолчанию свёрнут до 4 строк; если он длиннее — кнопка развернуть/свернуть.
+function CollapsibleText({ text }) {
+  const ref = useRef(null);
+  const [expanded, setExpanded] = useState(false);
+  const [overflow, setOverflow] = useState(false);
+
+  useEffect(() => {
+    if (expanded) return; // при развёрнутом не пересчитываем, чтобы кнопка не пропадала
+    const el = ref.current;
+    if (!el) return;
+    const check = () => setOverflow(el.scrollHeight - el.clientHeight > 1);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, [text, expanded]);
+
+  return (
+    <>
+      <div ref={ref} className={`note-text mt-1 ${expanded ? '' : 'clamp-lines'}`}>
+        {text}
+      </div>
+      {overflow && (
+        <button
+          type="button"
+          className="btn btn-sm btn-link p-0"
+          onClick={() => setExpanded((e) => !e)}
+        >
+          {expanded ? 'свернуть' : 'показать полностью'}
+        </button>
+      )}
+    </>
+  );
+}
 
 export default function OpenNotesPage() {
   const [notes, setNotes] = useState(null);
@@ -30,9 +64,7 @@ export default function OpenNotesPage() {
               {n.book} {n.chapter}:{n.verse} · {formatTime(n.updated_at)}
             </span>
           </div>
-          <div className="mt-1" style={{ whiteSpace: 'pre-wrap' }}>
-            {n.text}
-          </div>
+          <CollapsibleText text={n.text} />
           <div className="text-muted small mt-1">♥ {n.likes}</div>
         </div>
       ))}

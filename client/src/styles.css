@@ -392,3 +392,11 @@ body {
 .tap-card:active {
   background: #eef3f9;
 }
+
+/* Свёрнутый текст заметки: первые 4 строки */
+.clamp-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
