@@ -124,6 +124,16 @@ test('прогресс по плану: все дни со статусами и
   assert.ok(data.days.every((d) => 'status' in d && 'date' in d));
 });
 
+test('today отдаёт списки readDays и missedDays', async () => {
+  const c = makeClient();
+  await c('POST', '/api/auth/register', { login: 'test_today', password: '123' });
+  await c('POST', '/api/auth/plan', { planId: 'lite' });
+  const { status, data } = await c('GET', '/api/reading/today/lite');
+  assert.equal(status, 200);
+  assert.ok(Array.isArray(data.readDays));
+  assert.ok(Array.isArray(data.missedDays));
+});
+
 // --- Чтение и зачёт ---
 
 test('зачёт чтения: кламп секунд, порог и зелёный статус', async () => {

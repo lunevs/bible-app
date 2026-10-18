@@ -75,6 +75,9 @@ readingRouter.get('/reading/today/:planId', requireAuth, (req, res) => {
   const nextUnread = afterToday.find((d) => !isRead(d)) || afterToday[0] || null;
   // Прочитанные отрывки (включая сегодняшний, если прочитан), свежие сверху.
   const readDays = days.filter(isRead).reverse().slice(0, 10);
+  // Пропущенные отрывки: прошедшие и не прочитанные (в т.ч. даты до начала участия
+  // позднего участника) — их можно прочитать сейчас и получить синие галочки.
+  const missedDays = days.filter((d) => d.date < today && !isRead(d)).reverse();
 
   res.json({
     planId: plan.id,
@@ -83,6 +86,7 @@ readingRouter.get('/reading/today/:planId', requireAuth, (req, res) => {
     todayRead: todayEntry ? isRead(todayEntry) : false,
     nextUnread,
     readDays,
+    missedDays,
   });
 });
 

@@ -111,6 +111,15 @@ function PlanHome() {
         </div>
       )}
 
+      {data.missedDays?.length > 0 && (
+        <>
+          <div className="text-muted small mt-3 mb-2">пропущенные отрывки</div>
+          {data.missedDays.map((d) => (
+            <Row key={d.date} d={d} />
+          ))}
+        </>
+      )}
+
       {data.readDays?.length > 0 && (
         <>
           <div className="text-muted small mt-3 mb-2">прочитанные отрывки</div>
