@@ -76,17 +76,25 @@ function PlanHome() {
       </div>
 
       {data.today ? (
-        <div className="card-soft p-3 mb-3">
+        <div
+          className="card-soft p-3 mb-3 tap-card"
+          role="button"
+          tabIndex={0}
+          onClick={() => open(data.today)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              open(data.today);
+            }
+          }}
+        >
           <div className="d-flex justify-content-between align-items-start">
             <div>
               <div className="text-muted small">Сегодня · {formatDate(data.today.date)}</div>
-              <div className="h5 mt-1 mb-1">{data.today.label}</div>
+              <div className="h5 mt-1 mb-0">{data.today.label}</div>
             </div>
             <StatusBadge status={data.today.status} size={26} />
           </div>
-          <button className="btn btn-brand mt-2" onClick={() => open(data.today)}>
-            {['green', 'blue'].includes(data.today.status) ? 'Открыть ещё раз' : 'Читать'}
-          </button>
         </div>
       ) : (
         <div className="alert alert-info">
@@ -95,17 +103,25 @@ function PlanHome() {
       )}
 
       {data.nextUnread && (
-        <div className="card-soft p-3 mb-3">
+        <div
+          className="card-soft p-3 mb-3 tap-card"
+          role="button"
+          tabIndex={0}
+          onClick={() => open(data.nextUnread)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              open(data.nextUnread);
+            }
+          }}
+        >
           <div className="text-muted small">
             Следующий отрывок · {formatDate(data.nextUnread.date)}
           </div>
           <div className="d-flex justify-content-between align-items-start mt-1">
-            <div className="h5 mb-1">{data.nextUnread.label}</div>
+            <div className="h5 mb-0">{data.nextUnread.label}</div>
             <StatusBadge status={data.nextUnread.status} size={24} />
           </div>
-          <button className="btn btn-brand mt-2" onClick={() => open(data.nextUnread)}>
-            Читать
-          </button>
         </div>
       )}
 

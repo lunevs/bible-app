@@ -383,3 +383,12 @@ body {
 .icon-btn.danger {
   filter: saturate(1.2);
 }
+
+/* Кликабельная карточка на главной (открывается по тапу) */
+.tap-card {
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.tap-card:active {
+  background: #eef3f9;
+}
