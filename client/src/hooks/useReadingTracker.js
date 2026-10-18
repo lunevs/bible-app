@@ -5,7 +5,8 @@ import { api } from '../api.js';
 // секунды набегают, только когда вкладка видима И была недавняя активность
 // (прокрутка, касание, движение). Плюс отслеживание «дошёл до конца».
 export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, onStatus }) {
-  const [seconds, setSeconds] = useState(initialSeconds);
+  const [seconds, setSeconds] = useState(initialSeconds); // всего накоплено (включая прошлые сеансы)
+  const [sessionSeconds, setSessionSeconds] = useState(0); // только текущий сеанс (для показа)
   const [status, setStatus] = useState(null);
   const [reachedEnd, setReachedEnd] = useState(false);
 
@@ -58,6 +59,7 @@ export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, o
       secondsRef.current += 1;
       unsentRef.current += 1;
       setSeconds(secondsRef.current);
+      setSessionSeconds((s) => s + 1);
     }, 1000);
     return () => clearInterval(tick);
   }, [enabled]);
@@ -99,5 +101,5 @@ export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, o
     send();
   }, [send]);
 
-  return { seconds, status, reachedEnd, markReachedEnd, refs: { secondsRef } };
+  return { seconds, sessionSeconds, status, reachedEnd, markReachedEnd, refs: { secondsRef } };
 }

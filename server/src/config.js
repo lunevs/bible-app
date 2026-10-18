@@ -46,7 +46,7 @@ export const config = {
     // Минимальный порог активного времени (секунды).
     minSeconds: num(process.env.READING_MIN_SECONDS, 30),
     // Дополнительно к минимуму: секунд на каждый стих отрывка.
-    secondsPerVerse: num(process.env.READING_SECONDS_PER_VERSE, 2),
+    secondsPerVerse: num(process.env.READING_SECONDS_PER_VERSE, 1),
     // Столько секунд без активности сбрасывают «активное» состояние на клиенте.
     idleResetSeconds: num(process.env.READING_IDLE_RESET, 30),
     // Максимум секунд, которые сервер принимает за один запрос progress

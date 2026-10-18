@@ -118,12 +118,12 @@ test('зачёт чтения: кламп секунд, порог и зелён
   const c = makeClient();
   await c('POST', '/api/auth/register', { login: 'test_reader', password: '123' });
   await c('POST', '/api/auth/plan', { planId: 'lite' });
-  const date = '2026-10-19'; // первый день: Мк 1:1-20, порог 40 c
+  const date = '2026-10-19'; // первый день: Мк 1:1-20, порог 30 c (минимум)
 
   const info = await c('GET', `/api/reading/lite/${date}`);
   assert.equal(info.status, 200);
   assert.equal(info.data.verses.length, 20);
-  assert.equal(info.data.thresholdSeconds, 40);
+  assert.equal(info.data.thresholdSeconds, 30);
 
   // Огромное число секунд клампится разумным максимумом.
   const credited = await c('POST', '/api/reading/progress', { planId: 'lite', date, seconds: 9999, reachedEnd: true });

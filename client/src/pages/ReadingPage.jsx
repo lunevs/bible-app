@@ -64,7 +64,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
   const [viewVerse, setViewVerse] = useState(null); // окно «Заметки»
   const [toast, setToast] = useState('');
 
-  const { seconds, reachedEnd, markReachedEnd } = useReadingTracker({
+  const { seconds, sessionSeconds, reachedEnd, markReachedEnd } = useReadingTracker({
     planId: entry.planId,
     date: entry.date,
     enabled: true,
@@ -126,7 +126,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
               ? 'Дошли до конца. Ещё немного активного чтения — и зачтётся.'
               : 'Читайте: время накапливается, пока экран активен.'}
         </span>
-        <span>{seconds} c</span>
+        <span>{sessionSeconds} c</span>
       </div>
       <div className="progress mb-3" style={{ height: 6 }}>
         <div

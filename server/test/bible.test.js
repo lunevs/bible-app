@@ -18,13 +18,13 @@ test('отрывок Мк 1:1-20 содержит 20 стихов', () => {
   assert.equal(getPassageVerses(day.passage.ranges).length, 20);
 });
 
-test('порог = max(минимум, 2 сек × стихи); для 20 стихов это 40 секунд', () => {
+test('порог = max(минимум, 1 сек × стихи); для 20 стихов это 30 секунд (минимум)', () => {
   const day = getPlan('lite').days[0];
   assert.equal(
     thresholdFor(day.passage.ranges),
-    Math.max(config.reading.minSeconds, 2 * 20)
+    Math.max(config.reading.minSeconds, 1 * 20)
   );
-  assert.equal(thresholdFor(day.passage.ranges), 40);
+  assert.equal(thresholdFor(day.passage.ranges), 30);
 });
 
 test('составной рождественский отрывок (Лк 2:1-20 + Ин 1:14) = 21 стих', () => {
