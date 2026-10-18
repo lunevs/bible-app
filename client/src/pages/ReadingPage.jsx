@@ -390,7 +390,7 @@ function ViewNotesModal({ verse, onClose, onChanged }) {
             <>
               <textarea
                 className="form-control mb-2"
-                rows={3}
+                rows={6}
                 maxLength={2000}
                 autoFocus
                 value={editText}
