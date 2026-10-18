@@ -400,3 +400,22 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* «ещё» / «свернуть» для заметок — тёмно-серым, компактно */
+.note-wrap {
+  position: relative;
+}
+.clamp-toggle {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+.clamp-more {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding-left: 28px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #fff 45%);
+}

@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '../api.js';
 import { formatTime } from '../dates.js';
 
-// Текст заметки: по умолчанию свёрнут до 4 строк; если он длиннее — кнопка развернуть/свернуть.
+// Текст заметки: по умолчанию свёрнут до 4 строк. Если текст длиннее, в конце 4-й строки
+// показывается «ещё» (без переноса на новую строку); в развёрнутом виде — «свернуть».
 function CollapsibleText({ text }) {
   const ref = useRef(null);
   const [expanded, setExpanded] = useState(false);
@@ -19,20 +20,20 @@ function CollapsibleText({ text }) {
   }, [text, expanded]);
 
   return (
-    <>
-      <div ref={ref} className={`note-text mt-1 ${expanded ? '' : 'clamp-lines'}`}>
+    <div className="note-wrap mt-1">
+      <div ref={ref} className={`note-text ${expanded ? '' : 'clamp-lines'}`}>
         {text}
       </div>
-      {overflow && (
-        <button
-          type="button"
-          className="btn btn-sm btn-link p-0"
-          onClick={() => setExpanded((e) => !e)}
-        >
-          {expanded ? 'свернуть' : 'показать полностью'}
+      {expanded ? (
+        <button type="button" className="clamp-toggle" onClick={() => setExpanded(false)}>
+          свернуть
         </button>
-      )}
-    </>
+      ) : overflow ? (
+        <button type="button" className="clamp-toggle clamp-more" onClick={() => setExpanded(true)}>
+          ещё
+        </button>
+      ) : null}
+    </div>
   );
 }
 
