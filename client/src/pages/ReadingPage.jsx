@@ -429,7 +429,7 @@ function ViewNotesModal({ verse, onClose, onChanged }) {
             <>
               <div className="d-flex justify-content-between align-items-center">
                 <span className="badge text-bg-light">
-                  {n.visibility === 'open' ? 'открытая' : 'личная'}
+                  {n.visibility === 'open' ? 'опубликована' : 'личная'}
                 </span>
                 <div className="d-flex gap-1">
                   <button
