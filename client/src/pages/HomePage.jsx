@@ -1,26 +1,18 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { api } from '../api.js';
 import { StatusBadge } from '../components/StatusBadge.jsx';
 import { formatDate } from '../dates.js';
+import PlanSelectPage from './PlanSelectPage.jsx';
 
 export default function HomePage() {
   const { user } = useAuth();
 
   if (!user) return null;
 
-  if (!user.planId) {
-    return (
-      <div className="container py-4">
-        <h1 className="h4">Здравствуйте, {user.login}!</h1>
-        <p className="text-muted">Вы ещё не выбрали план чтения.</p>
-        <Link className="btn btn-brand" to="/plans">
-          Выбрать план
-        </Link>
-      </div>
-    );
-  }
+  // Новый пользователь: сразу показываем планы на вкладке «Чтение», без промежуточной кнопки.
+  if (!user.planId) return <PlanSelectPage />;
 
   return <PlanHome />;
 }
