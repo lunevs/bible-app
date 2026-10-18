@@ -52,18 +52,10 @@ export default function PlanSelectPage() {
         const active = user.planId === p.id;
         return (
           <div key={p.id} className={`card-soft p-3 mb-3 ${active ? 'border-primary' : ''}`}>
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <div className="h6 mb-0">
-                  {p.name} {active && <span className="badge text-bg-primary ms-1">выбран</span>}
-                </div>
-                <div className="text-muted small">{p.description}</div>
-              </div>
-              <div className="text-end">
-                <div className="fw-semibold">{p.days}</div>
-                <div className="text-muted small">записей</div>
-              </div>
+            <div className="h6 mb-0">
+              {p.name} {active && <span className="badge text-bg-primary ms-1">выбран</span>}
             </div>
+            <div className="text-muted small">{p.description}</div>
             <button
               className={`btn mt-3 w-100 ${active ? 'btn-outline-secondary' : 'btn-brand'}`}
               disabled={active}
