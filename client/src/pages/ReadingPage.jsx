@@ -385,7 +385,7 @@ function ViewNotesModal({ verse, onClose, onChanged }) {
   const open = data?.open || [];
 
   return (
-    <Modal title={`Мои заметки · ${verseRef(verse)}`} onClose={onClose}>
+    <Modal title="Заметки" onClose={onClose}>
       <div className="modal-verse-text mb-3">{verse.text}</div>
 
       {error && <div className="alert alert-danger py-1 small">{error}</div>}
@@ -403,29 +403,25 @@ function ViewNotesModal({ verse, onClose, onChanged }) {
                 value={editText}
                 onChange={(e) => setEditText(e.target.value)}
               />
-              <button
-                type="button"
-                className={`vis-toggle ${editVisibility === 'open' ? 'on' : ''}`}
-                onClick={() => setEditVisibility((v) => (v === 'open' ? 'personal' : 'open'))}
-                aria-pressed={editVisibility === 'open'}
-              >
-                <span className="vis-switch" aria-hidden="true">
-                  <span className="vis-knob" />
-                </span>
-                <span className="vis-label">
-                  {editVisibility === 'open' ? 'Открыта для всех' : 'Личная — только вы'}
-                </span>
-              </button>
-              <div className="d-flex gap-2 mt-2">
+              <div className="d-flex align-items-center gap-2">
+                <label className="d-flex align-items-center gap-2 mb-0 me-auto">
+                  <input
+                    type="checkbox"
+                    className="form-check-input mt-0"
+                    checked={editVisibility === 'open'}
+                    onChange={(e) => setEditVisibility(e.target.checked ? 'open' : 'personal')}
+                  />
+                  <span>публичная</span>
+                </label>
+                <button className="btn btn-outline-secondary btn-sm" onClick={cancelEdit}>
+                  Отмена
+                </button>
                 <button
-                  className="btn btn-brand btn-sm flex-fill"
+                  className="btn btn-brand btn-sm"
                   disabled={!editText.trim()}
                   onClick={() => saveEdit(n)}
                 >
                   Сохранить
-                </button>
-                <button className="btn btn-outline-secondary btn-sm" onClick={cancelEdit}>
-                  Отмена
                 </button>
               </div>
             </>
