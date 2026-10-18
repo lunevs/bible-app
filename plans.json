@@ -19,7 +19,7 @@
   {
    "id": "lite",
    "name": "Лайт",
-   "description": "Евангелие от Марка, Пн/Ср/Пт",
+   "description": "1 Евангелие, три раза в неделю по 10 минут",
    "readingWeekdays": [
     1,
     3,
@@ -699,7 +699,7 @@
   {
    "id": "standard",
    "name": "Стандарт",
-   "description": "Марк и Иоанн, Пн–Пт",
+   "description": "2 Евангелия, по будням по 12 минут",
    "readingWeekdays": [
     1,
     2,
@@ -1821,7 +1821,7 @@
   {
    "id": "hard",
    "name": "Хард",
-   "description": "Марк, Матфей, Лука, Иоанн, каждый день",
+   "description": "Все Евангелия, каждый день по 15 минут",
    "readingWeekdays": [
     0,
     1,
