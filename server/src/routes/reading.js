@@ -86,6 +86,17 @@ readingRouter.get('/reading/today/:planId', requireAuth, (req, res) => {
   });
 });
 
+// Весь план со статусами пользователя — для экрана «Прогресс».
+readingRouter.get('/progress/:planId', requireAuth, (req, res) => {
+  const plan = getPlan(req.params.planId);
+  if (!plan) return res.status(404).json({ error: 'План не найден' });
+  const days = userDays(req.user, plan.id).map((d, i) => ({
+    ...d,
+    label: plan.days[i].passage.label,
+  }));
+  res.json({ planId: plan.id, planName: plan.name, days });
+});
+
 // Данные записи плана на дату: подпись, диапазоны, стихи, главный стих, порог, статус.
 readingRouter.get('/reading/:planId/:date', requireAuth, (req, res) => {
   const { planId, date } = req.params;

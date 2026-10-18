@@ -13,7 +13,7 @@ export default function ProgressPage() {
 
   useEffect(() => {
     if (!user?.planId) return;
-    api.get(`/reading/today/${user.planId}`).then(setData);
+    api.get(`/progress/${user.planId}`).then(setData);
   }, [user]);
 
   if (!user?.planId) {
@@ -24,8 +24,7 @@ export default function ProgressPage() {
     );
   }
 
-  const all = data ? [...data.past, ...(data.today ? [data.today] : []), ...data.upcoming] : [];
-  all.sort((a, b) => (a.date < b.date ? -1 : 1));
+  const all = data?.days || [];
 
   const counts = all.reduce(
     (acc, d) => {

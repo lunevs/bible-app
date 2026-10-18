@@ -112,6 +112,18 @@ test('список планов содержит 30/50/68 записей', async
   assert.deepEqual(counts, { lite: 30, standard: 50, hard: 68 });
 });
 
+test('прогресс по плану: все дни со статусами и подписями', async () => {
+  const c = makeClient();
+  await c('POST', '/api/auth/register', { login: 'test_progress', password: '123' });
+  await c('POST', '/api/auth/plan', { planId: 'lite' });
+  const { status, data } = await c('GET', '/api/progress/lite');
+  assert.equal(status, 200);
+  assert.equal(data.planName, 'Лайт');
+  assert.equal(data.days.length, 30);
+  assert.ok(data.days[0].label);
+  assert.ok(data.days.every((d) => 'status' in d && 'date' in d));
+});
+
 // --- Чтение и зачёт ---
 
 test('зачёт чтения: кламп секунд, порог и зелёный статус', async () => {
