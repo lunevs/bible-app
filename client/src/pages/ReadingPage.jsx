@@ -299,12 +299,12 @@ function AddNoteModal({ verse, onClose, onAdded }) {
   };
 
   return (
-    <Modal title={`Добавить заметку · ${verseRef(verse)}`} onClose={onClose}>
+    <Modal title="Заметка" onClose={onClose}>
       <div className="modal-verse-text mb-3">{verse.text}</div>
 
       <textarea
         className="form-control mb-2"
-        rows={4}
+        rows={6}
         maxLength={2000}
         autoFocus
         placeholder="Ваша заметка к этому стиху…"
@@ -313,27 +313,20 @@ function AddNoteModal({ verse, onClose, onAdded }) {
       />
       {error && <div className="alert alert-danger py-1 small">{error}</div>}
 
-      <button
-        type="button"
-        className={`vis-toggle ${visibility === 'open' ? 'on' : ''}`}
-        onClick={() => setVisibility((v) => (v === 'open' ? 'personal' : 'open'))}
-        aria-pressed={visibility === 'open'}
-      >
-        <span className="vis-switch" aria-hidden="true">
-          <span className="vis-knob" />
-        </span>
-        <span className="vis-label">
-          {visibility === 'open' ? 'Открыта для всех' : 'Личная — только вы'}
-        </span>
-      </button>
-
-      <button
-        className="btn btn-brand w-100 mt-3"
-        disabled={busy || !text.trim()}
-        onClick={submit}
-      >
-        Добавить
-      </button>
+      <div className="d-flex align-items-center gap-3">
+        <label className="d-flex align-items-center gap-2 mb-0 me-auto">
+          <input
+            type="checkbox"
+            className="form-check-input mt-0"
+            checked={visibility === 'open'}
+            onChange={(e) => setVisibility(e.target.checked ? 'open' : 'personal')}
+          />
+          <span>публичная</span>
+        </label>
+        <button className="btn btn-brand px-4" disabled={busy || !text.trim()} onClick={submit}>
+          Добавить
+        </button>
+      </div>
     </Modal>
   );
 }
