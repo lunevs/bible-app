@@ -60,7 +60,7 @@ export default function SettingsPage() {
         </Link>
         <button
           type="button"
-          className="settings-action card-soft"
+          className="btn btn-outline-secondary w-100"
           aria-expanded={passwordFormOpen}
           aria-controls="change-password-form"
           onClick={() => {
@@ -70,7 +70,6 @@ export default function SettingsPage() {
           }}
         >
           <span>Сменить пароль</span>
-          <span className="settings-action-arrow" aria-hidden="true">{passwordFormOpen ? '−' : '+'}</span>
         </button>
         {passwordFormOpen && (
           <form id="change-password-form" className="card-soft p-3" onSubmit={changePassword}>

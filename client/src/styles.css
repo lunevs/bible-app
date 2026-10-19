@@ -512,8 +512,6 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 .plan-card-arrow { color: var(--brand); font-size: 1.2rem; font-weight: 700; }
 .plan-card-action { margin-top: 12px; color: var(--brand); font-size: 0.84rem; font-weight: 700; }
 .plan-card.selected .plan-card-action { color: var(--muted); }
-.settings-action { display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 12px 14px; color: #263b33; font: inherit; font-weight: 600; text-align: left; }
-.settings-action-arrow { color: var(--brand); font-size: 1.25rem; line-height: 1; }
 .day-row { min-height: 62px; background: var(--surface); border: 1px solid var(--line) !important; border-radius: 14px; }
 .day-row .label { line-height: 1.3; }
 
