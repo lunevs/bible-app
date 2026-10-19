@@ -11,6 +11,7 @@ export default function SettingsPage() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [passwordFormOpen, setPasswordFormOpen] = useState(false);
 
   const changePassword = async (event) => {
     event.preventDefault();
@@ -36,7 +37,7 @@ export default function SettingsPage() {
 
   return (
     <div className="container py-3">
-      <h1 className="h5 mb-3">Ещё</h1>
+      <h1 className="h5 mb-3">Настройки приложения</h1>
 
       <div className="card-soft p-3 mb-3">
         <div className="d-flex justify-content-between">
@@ -53,42 +54,56 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <form className="card-soft p-3 mb-3" onSubmit={changePassword}>
-        <h2 className="h6 mb-3">Сменить пароль</h2>
-        <label className="form-label" htmlFor="new-password">Новый пароль</label>
-        <input
-          id="new-password"
-          className="form-control mb-3"
-          type="password"
-          autoComplete="new-password"
-          minLength={3}
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <label className="form-label" htmlFor="repeat-password">Повторите новый пароль</label>
-        <input
-          id="repeat-password"
-          className="form-control mb-3"
-          type="password"
-          autoComplete="new-password"
-          minLength={3}
-          required
-          value={passwordRepeat}
-          onChange={(e) => setPasswordRepeat(e.target.value)}
-        />
-        {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
-        {message && <div className="alert alert-success py-2" role="status">{message}</div>}
-        <button className="btn btn-brand w-100" type="submit" disabled={busy || !password || !passwordRepeat}>
-          {busy ? 'Сохраняем…' : 'Сменить пароль'}
-        </button>
-        <div className="form-text mt-2">Старый пароль вводить не нужно. Минимальная длина — 3 символа.</div>
-      </form>
-
       <div className="d-grid gap-2">
         <Link className="btn btn-outline-secondary" to="/plans">
           План чтения
         </Link>
+        <button
+          type="button"
+          className="settings-action card-soft"
+          aria-expanded={passwordFormOpen}
+          aria-controls="change-password-form"
+          onClick={() => {
+            setPasswordFormOpen((open) => !open);
+            setError('');
+            setMessage('');
+          }}
+        >
+          <span>Сменить пароль</span>
+          <span className="settings-action-arrow" aria-hidden="true">{passwordFormOpen ? '−' : '+'}</span>
+        </button>
+        {passwordFormOpen && (
+          <form id="change-password-form" className="card-soft p-3" onSubmit={changePassword}>
+            <label className="form-label" htmlFor="new-password">Новый пароль</label>
+            <input
+              id="new-password"
+              className="form-control mb-3"
+              type="password"
+              autoComplete="new-password"
+              minLength={3}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <label className="form-label" htmlFor="repeat-password">Повторите новый пароль</label>
+            <input
+              id="repeat-password"
+              className="form-control mb-3"
+              type="password"
+              autoComplete="new-password"
+              minLength={3}
+              required
+              value={passwordRepeat}
+              onChange={(e) => setPasswordRepeat(e.target.value)}
+            />
+            {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
+            {message && <div className="alert alert-success py-2" role="status">{message}</div>}
+            <button className="btn btn-brand w-100" type="submit" disabled={busy || !password || !passwordRepeat}>
+              {busy ? 'Сохраняем…' : 'Сохранить новый пароль'}
+            </button>
+            <div className="form-text mt-2">Старый пароль вводить не нужно. Минимальная длина — 3 символа.</div>
+          </form>
+        )}
         {user.role === 'admin' && (
           <Link className="btn btn-outline-secondary" to="/admin">
             Панель администратора
