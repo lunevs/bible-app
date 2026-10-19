@@ -58,6 +58,41 @@ CREATE TABLE IF NOT EXISTS likes (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS questions (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL,
+  book       TEXT    NOT NULL,
+  chapter    INTEGER NOT NULL,
+  verse      INTEGER NOT NULL,
+  text       TEXT    NOT NULL,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_questions_created ON questions (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_questions_verse ON questions (book, chapter, verse);
+
+CREATE TABLE IF NOT EXISTS question_answers (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  question_id INTEGER NOT NULL,
+  user_id     INTEGER NOT NULL,
+  text        TEXT    NOT NULL,
+  created_at  INTEGER NOT NULL,
+  updated_at  INTEGER NOT NULL,
+  FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_question_answers_question ON question_answers (question_id, created_at);
+
+CREATE TABLE IF NOT EXISTS answer_likes (
+  answer_id  INTEGER NOT NULL,
+  user_id    INTEGER NOT NULL,
+  created_at INTEGER NOT NULL,
+  PRIMARY KEY (answer_id, user_id),
+  FOREIGN KEY (answer_id) REFERENCES question_answers(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS sessions (
   token      TEXT    PRIMARY KEY,
   user_id    INTEGER NOT NULL,

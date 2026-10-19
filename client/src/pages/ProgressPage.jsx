@@ -5,23 +5,22 @@ import { Legend } from '../components/StatusBadge.jsx';
 import { StatusBadge } from '../components/StatusBadge.jsx';
 import { formatDate } from '../dates.js';
 import { useNavigate } from 'react-router-dom';
+import PlanSelectPage from './PlanSelectPage.jsx';
 
 export default function ProgressPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [homeData, setHomeData] = useState(null);
 
   useEffect(() => {
     if (!user?.planId) return;
     api.get(`/progress/${user.planId}`).then(setData);
+    api.get(`/reading/today/${user.planId}`).then(setHomeData);
   }, [user]);
 
   if (!user?.planId) {
-    return (
-      <div className="container py-4">
-        <p className="text-muted">Сначала выберите план.</p>
-      </div>
-    );
+    return <PlanSelectPage />;
   }
 
   const all = data?.days || [];
@@ -36,7 +35,10 @@ export default function ProgressPage() {
 
   return (
     <div className="container py-3">
-      <h1 className="h5 mb-3">Прогресс</h1>
+      <div className="home-heading mb-3">
+        <div className="home-greeting">План чтения</div>
+        <h1 className="h5 mb-0">{user.login}. План чтения: {data?.planName || '…'}</h1>
+      </div>
       {data && (
         <div className="card-soft progress-summary p-3 mb-3">
           <div className="progress-summary-heading">
@@ -54,11 +56,45 @@ export default function ProgressPage() {
         </div>
       )}
 
+      {homeData?.today && !homeData.todayRead && (
+        <button
+          type="button"
+          className="card-soft today-reading-card w-100 text-start p-3 mb-3"
+          onClick={() => navigate(`/read/${user.planId}/${homeData.today.date}`)}
+        >
+          <span className="text-muted small">Чтение на сегодня · {formatDate(homeData.today.date)}</span>
+          <span className="d-flex justify-content-between align-items-center gap-2 mt-1">
+            <strong>{homeData.today.label}</strong>
+            <StatusBadge status={homeData.today.status} size={24} />
+          </span>
+          <span className="reading-card-action">Открыть чтение <span aria-hidden="true">→</span></span>
+        </button>
+      )}
+
+      {homeData?.today && homeData.todayRead && (
+        <div className="today-reading-done mb-3">
+          <StatusBadge status={homeData.today.status} size={22} />
+          <span>Отрывок на сегодня прочитан</span>
+          <button
+            type="button"
+            className="today-open-link"
+            onClick={() => navigate(`/read/${user.planId}/${homeData.today.date}`)}
+          >
+            Открыть
+          </button>
+        </div>
+      )}
+
+      {homeData && !homeData.today && (
+        <div className="alert alert-info">На сегодня записей в плане нет.</div>
+      )}
+
       <details className="status-legend mb-3">
         <summary>Что означают отметки?</summary>
         <Legend />
       </details>
 
+      <h2 className="home-section-title plan-list-title">Весь план</h2>
       {all.map((d) => (
         <button
           key={d.date}

@@ -41,16 +41,18 @@ export function userDays(user, planId = user.plan_id, nowTs = Date.now()) {
   });
 }
 
-// Один балл за каждый лайк, полученный на заметки пользователя.
+// Один балл за каждый лайк, полученный на заметки или ответы пользователя.
 export const LIKE_POINTS = 1;
 
-// Сколько лайков всего получили заметки пользователя.
+// Сколько лайков всего получили заметки и ответы пользователя.
 export function likesReceived(userId) {
   const row = db
     .prepare(
-      'SELECT COUNT(*) AS c FROM likes l JOIN notes n ON n.id = l.note_id WHERE n.user_id = ?'
+      `SELECT
+         (SELECT COUNT(*) FROM likes l JOIN notes n ON n.id = l.note_id WHERE n.user_id = ?) +
+         (SELECT COUNT(*) FROM answer_likes al JOIN question_answers a ON a.id = al.answer_id WHERE a.user_id = ?) AS c`
     )
-    .get(userId);
+    .get(userId, userId);
   return row?.c || 0;
 }
 

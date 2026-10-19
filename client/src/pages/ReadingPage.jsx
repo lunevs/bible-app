@@ -62,6 +62,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
 
   const [actionVerse, setActionVerse] = useState(null); // меню действий по стиху
   const [addVerse, setAddVerse] = useState(null); // окно «Добавить заметку»
+  const [askVerse, setAskVerse] = useState(null); // окно «Задать вопрос»
   const [viewVerse, setViewVerse] = useState(null); // окно «Заметки»
   const [toast, setToast] = useState('');
 
@@ -202,6 +203,10 @@ function Reader({ entry, status, setStatus, onChanged }) {
             setAddVerse(actionVerse);
             setActionVerse(null);
           }}
+          onAskQuestion={() => {
+            setAskVerse(actionVerse);
+            setActionVerse(null);
+          }}
           onCopy={() => handleCopy(actionVerse)}
         />
       )}
@@ -214,6 +219,17 @@ function Reader({ entry, status, setStatus, onChanged }) {
             setAddVerse(null);
             setToast('Заметка добавлена');
             onChanged();
+          }}
+        />
+      )}
+
+      {askVerse && (
+        <AskQuestionModal
+          verse={askVerse}
+          onClose={() => setAskVerse(null)}
+          onCreated={() => {
+            setAskVerse(null);
+            setToast('Вопрос опубликован');
           }}
         />
       )}
@@ -245,7 +261,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-function ActionSheet({ verse, onClose, onAddNote, onCopy }) {
+function ActionSheet({ verse, onClose, onAddNote, onAskQuestion, onCopy }) {
   return (
     <div className="sheet-overlay" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -255,6 +271,9 @@ function ActionSheet({ verse, onClose, onAddNote, onCopy }) {
         </div>
         <button className="sheet-item" onClick={onAddNote}>
           📝 Добавить заметку
+        </button>
+        <button className="sheet-item" onClick={onAskQuestion}>
+          ❔ Задать вопрос
         </button>
         <button className="sheet-item" onClick={onCopy}>
           📋 Копировать
@@ -321,6 +340,57 @@ function AddNoteModal({ verse, onClose, onAdded }) {
         </label>
         <button className="btn btn-brand px-4" disabled={busy || !text.trim()} onClick={submit}>
           Добавить
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+function AskQuestionModal({ verse, onClose, onCreated }) {
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const submit = async () => {
+    if (!text.trim()) return;
+    setBusy(true);
+    setError('');
+    try {
+      await api.post('/questions', {
+        book: verse.book,
+        chapter: verse.chapter,
+        verse: verse.verse,
+        text,
+      });
+      onCreated?.();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal title="Задать вопрос" onClose={onClose}>
+      <div className="modal-verse-text mb-3">
+        <div className="small text-muted mb-1">{verseRef(verse)}</div>
+        {verse.text}
+      </div>
+      <p className="text-muted small">Вопрос будет опубликован и доступен всем участникам.</p>
+      <textarea
+        className="form-control mb-2"
+        rows={4}
+        maxLength={2000}
+        autoFocus
+        placeholder="Что вы хотели бы обсудить?"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+      {error && <div className="alert alert-danger py-1 small">{error}</div>}
+      <div className="d-flex justify-content-end gap-2">
+        <button type="button" className="btn btn-outline-secondary" onClick={onClose}>Отмена</button>
+        <button type="button" className="btn btn-brand px-4" disabled={busy || !text.trim()} onClick={submit}>
+          Опубликовать
         </button>
       </div>
     </Modal>

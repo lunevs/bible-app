@@ -12,6 +12,7 @@ import { attachUser, hashPassword, normalizeLogin } from './auth.js';
 import { authRouter } from './routes/auth.js';
 import { readingRouter } from './routes/reading.js';
 import { notesRouter } from './routes/notes.js';
+import { questionsRouter } from './routes/questions.js';
 import { leaderboardRouter } from './routes/leaderboard.js';
 import { adminRouter } from './routes/admin.js';
 
@@ -40,6 +41,7 @@ app.use(attachUser);
 app.use('/api/auth', authRouter);
 app.use('/api', readingRouter);
 app.use('/api', notesRouter);
+app.use('/api', questionsRouter);
 app.use('/api', leaderboardRouter);
 app.use('/api/admin', adminRouter);
 

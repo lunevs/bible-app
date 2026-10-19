@@ -234,6 +234,80 @@ test('лента заметок сообщает, поставил ли поль
   assert.equal(ownNote.likedByMe, false);
 });
 
+test('вопросы публичны, ответы загружаются отдельно и авторы управляют своими публикациями', async () => {
+  const author = makeClient();
+  const participant = makeClient();
+  const admin = makeClient();
+  await author('POST', '/api/auth/register', { login: 'test_question_author', password: '123' });
+  await participant('POST', '/api/auth/register', { login: 'test_question_participant', password: '123' });
+  await admin('POST', '/api/auth/login', { login: 'admin', password: 'admin123' });
+
+  const invalid = await author('POST', '/api/questions', { book: 'Мк', chapter: 999, verse: 1, text: 'Вопрос?' });
+  assert.equal(invalid.status, 400);
+  const created = await author('POST', '/api/questions', { book: 'Мк', chapter: 1, verse: 15, text: 'Что значит этот стих?' });
+  assert.equal(created.status, 201);
+
+  const feed = await participant('GET', '/api/questions');
+  const question = feed.data.questions.find((item) => item.id === created.data.id);
+  assert.ok(question);
+  assert.equal(question.isMine, false);
+  assert.equal(question.answerCount, 0);
+  assert.ok(question.verseText.length > 0);
+  assert.deepEqual((await participant('GET', `/api/questions/${question.id}/answers`)).data.answers, []);
+
+  const answer = await participant('POST', `/api/questions/${question.id}/answers`, { text: 'Думаю, здесь говорится о вере.' });
+  assert.equal(answer.status, 201);
+  const initialAnswer = (await participant('GET', `/api/questions/${question.id}/answers`)).data.answers[0];
+  assert.equal(initialAnswer.isMine, true);
+  assert.equal(initialAnswer.likes, 0);
+  assert.equal(initialAnswer.likedByMe, false);
+  assert.equal((await participant('POST', `/api/question-answers/${answer.data.id}/like`)).status, 400);
+
+  const answerFan = makeClient();
+  await answerFan('POST', '/api/auth/register', { login: 'test_answer_fan', password: '123' });
+  const answerLike = await answerFan('POST', `/api/question-answers/${answer.data.id}/like`);
+  assert.deepEqual(answerLike.data, { liked: true, likes: 1 });
+  const afterAnswerLike = (await participant('GET', `/api/questions/${question.id}/answers`)).data.answers[0];
+  assert.equal(afterAnswerLike.likes, 1);
+  assert.equal(afterAnswerLike.likedByMe, false);
+  const answerAuthorSummary = (await author('GET', '/api/leaderboard')).data.leaderboard.find((item) => item.login === 'test_question_participant');
+  assert.equal(answerAuthorSummary.likes, 1);
+  assert.equal(answerAuthorSummary.likePoints, 1);
+  assert.equal(answerAuthorSummary.points, 1);
+  const removedAnswerLike = await answerFan('POST', `/api/question-answers/${answer.data.id}/like`);
+  assert.deepEqual(removedAnswerLike.data, { liked: false, likes: 0 });
+  const summaryAfterUnlike = (await author('GET', '/api/leaderboard')).data.leaderboard.find((item) => item.login === 'test_question_participant');
+  assert.equal(summaryAfterUnlike.points, 0);
+
+  assert.equal((await author('PATCH', `/api/questions/${question.id}`, { text: 'Уточнённый вопрос' })).status, 200);
+  assert.equal((await participant('PATCH', `/api/questions/${question.id}`, { text: 'Чужая правка' })).status, 403);
+  assert.equal((await author('PATCH', `/api/question-answers/${answer.data.id}`, { text: 'Правка автора ответа' })).status, 403);
+
+  const ownAnswer = await author('POST', `/api/questions/${question.id}/answers`, { text: 'Ответ автора вопроса' });
+  assert.equal((await author('PATCH', `/api/question-answers/${ownAnswer.data.id}`, { text: 'Исправленный ответ автора' })).status, 200);
+  assert.equal((await author('DELETE', `/api/question-answers/${ownAnswer.data.id}`)).status, 200);
+
+  const removed = await admin('DELETE', `/api/questions/${question.id}`);
+  assert.equal(removed.status, 200);
+  assert.equal((await author('GET', `/api/questions/${question.id}/answers`)).status, 404);
+});
+
+test('участник не может удалять чужой вопрос или чужой ответ', async () => {
+  const author = makeClient();
+  const other = makeClient();
+  await author('POST', '/api/auth/register', { login: 'test_question_owner', password: '123' });
+  await other('POST', '/api/auth/register', { login: 'test_question_other', password: '123' });
+  const question = await author('POST', '/api/questions', { book: 'Ин', chapter: 1, verse: 1, text: 'Почему так начинается Евангелие?' });
+  const answer = await other('POST', `/api/questions/${question.data.id}/answers`, { text: 'Это вступление.' });
+  assert.equal((await other('DELETE', `/api/questions/${question.data.id}`)).status, 403);
+  assert.equal((await author('DELETE', `/api/question-answers/${answer.data.id}`)).status, 403);
+  assert.equal((await (async () => {
+    const admin = makeClient();
+    await admin('POST', '/api/auth/login', { login: 'admin', password: 'admin123' });
+    return admin('DELETE', `/api/question-answers/${answer.data.id}`);
+  })()).status, 200);
+});
+
 // --- Лидерборд ---
 
 test('доска лидеров: баллы и сортировка', async () => {

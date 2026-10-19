@@ -1,7 +1,6 @@
 import { Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import { useAuth } from './auth.jsx';
 import AuthPage from './pages/AuthPage.jsx';
-import HomePage from './pages/HomePage.jsx';
 import PlanSelectPage from './pages/PlanSelectPage.jsx';
 import ReadingPage from './pages/ReadingPage.jsx';
 import ProgressPage from './pages/ProgressPage.jsx';
@@ -9,6 +8,7 @@ import LeaderboardPage from './pages/LeaderboardPage.jsx';
 import SettingsPage from './pages/SettingsPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import OpenNotesPage from './pages/OpenNotesPage.jsx';
+import QuestionsPage from './pages/QuestionsPage.jsx';
 
 function BottomNav() {
   const { user } = useAuth();
@@ -16,8 +16,8 @@ function BottomNav() {
 
   const icons = {
     read: <><path d="M12 7v14" /><path d="M3 18V5a1 1 0 0 1 1-1h4a4 4 0 0 1 4 4 4 4 0 0 1 4-4h4a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-4a4 4 0 0 0-4 2 4 4 0 0 0-4-2H4a1 1 0 0 1-1-1Z" /></>,
-    progress: <><path d="M4 19V5" /><path d="M4 19h17" /><path d="m7 15 4-4 3 2 5-6" /></>,
     notes: <><path d="M8 6h13" /><path d="M8 12h13" /><path d="M8 18h13" /><path d="M3 6h.01" /><path d="M3 12h.01" /><path d="M3 18h.01" /></>,
+    questions: <><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z" /><path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-.9.8-1.7 1-1.7 2.2" /><path d="M12 16h.01" /></>,
     leaderboard: <><path d="M8 21h8" /><path d="M12 17v4" /><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" /><path d="M7 7H4v2a4 4 0 0 0 4 4" /><path d="M17 7h3v2a4 4 0 0 1-4 4" /></>,
     more: <><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>,
   };
@@ -34,13 +34,13 @@ function BottomNav() {
         <Icon name="read" />
         Чтение
       </NavLink>
-      <NavLink to="/progress">
-        <Icon name="progress" />
-        Прогресс
-      </NavLink>
       <NavLink to="/notes">
         <Icon name="notes" />
         Заметки
+      </NavLink>
+      <NavLink to="/questions">
+        <Icon name="questions" />
+        Вопросы
       </NavLink>
       <NavLink to="/leaderboard">
         <Icon name="leaderboard" />
@@ -76,12 +76,13 @@ export default function App() {
   return (
     <div className="app-shell">
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<ProgressPage />} />
         <Route path="/plans" element={<PlanSelectPage />} />
         <Route path="/read/:planId/:date" element={<ReadingPage />} />
-        <Route path="/progress" element={<ProgressPage />} />
+        <Route path="/progress" element={<Navigate to="/" replace />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/notes" element={<OpenNotesPage />} />
+        <Route path="/questions" element={<QuestionsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/admin" element={user.role === 'admin' ? <AdminPage /> : <Navigate to="/" />} />
         <Route path="*" element={<Navigate to="/" />} />
