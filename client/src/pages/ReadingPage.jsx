@@ -66,13 +66,19 @@ function Reader({ entry, status, setStatus, onChanged }) {
   const [viewVerse, setViewVerse] = useState(null); // окно «Заметки»
   const [toast, setToast] = useState('');
 
-  const { seconds, sessionSeconds, reachedEnd, markReachedEnd } = useReadingTracker({
+  const timerDuration = entry.verses.length * 2;
+  const { remainingSeconds, markReachedEnd } = useReadingTracker({
     planId: entry.planId,
     date: entry.date,
-    enabled: true,
+    enabled: entry.status !== 'green' && entry.status !== 'blue',
     initialSeconds: entry.progress.seconds,
+    thresholdSeconds: timerDuration,
     onStatus: setStatus,
   });
+
+  const readStatus = status === 'green' || status === 'blue';
+  const credited = readStatus && remainingSeconds === 0;
+  const progressPct = Math.min(100, Math.round(((timerDuration - remainingSeconds) / timerDuration) * 100));
 
   // Отслеживание «дошёл до конца отрывка».
   useEffect(() => {
@@ -95,8 +101,6 @@ function Reader({ entry, status, setStatus, onChanged }) {
     return () => clearTimeout(t);
   }, [toast]);
 
-  const credited = status === 'green' || status === 'blue';
-  const progressPct = Math.min(100, Math.round((seconds / entry.thresholdSeconds) * 100));
   const myNotes = entry.myNotes || {};
 
   const handleCopy = async (verse) => {
@@ -121,14 +125,12 @@ function Reader({ entry, status, setStatus, onChanged }) {
       )}
 
       <div className="reader-progress d-flex justify-content-between align-items-center" aria-live="polite">
-        <span>
-          {credited
-            ? 'Отрывок прочитан'
-            : reachedEnd
-              ? 'Дошли до конца. Ещё немного активного чтения — и зачтётся.'
-              : 'Читайте: время накапливается, пока экран активен.'}
-        </span>
-        <span className="reading-timer" aria-label={`Время чтения в этой сессии: ${sessionSeconds} секунд`}>{sessionSeconds} с</span>
+        <span>{credited ? 'Отрывок прочитан' : 'Чтение отрывка'}</span>
+        {!credited && (
+          <span className="reading-timer" aria-label={`До зачёта чтения осталось ${remainingSeconds} секунд`}>
+            {remainingSeconds} с
+          </span>
+        )}
       </div>
       <div className="progress mb-3" style={{ height: 6 }}>
         <div className="progress-bar"

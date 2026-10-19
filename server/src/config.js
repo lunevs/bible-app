@@ -43,10 +43,10 @@ export const config = {
 
   // --- Фиксация факта прочтения (раздел 6 ТЗ) ---
   reading: {
-    // Минимальный порог активного времени (секунды).
-    minSeconds: num(process.env.READING_MIN_SECONDS, 30),
-    // Дополнительно к минимуму: секунд на каждый стих отрывка.
-    secondsPerVerse: num(process.env.READING_SECONDS_PER_VERSE, 1),
+    // Нижняя граница порога (секунды). По умолчанию ограничение выключено.
+    minSeconds: num(process.env.READING_MIN_SECONDS, 0),
+    // Серверный порог засчитывания: секунд на каждый стих отрывка.
+    secondsPerVerse: num(process.env.READING_SECONDS_PER_VERSE, 2),
     // Столько секунд без активности сбрасывают «активное» состояние на клиенте.
     idleResetSeconds: num(process.env.READING_IDLE_RESET, 30),
     // Максимум секунд, которые сервер принимает за один запрос progress

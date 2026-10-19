@@ -171,12 +171,12 @@ test('зачёт чтения: кламп секунд, порог и зелён
   const c = makeClient();
   await c('POST', '/api/auth/register', { login: 'test_reader', password: '123' });
   await c('POST', '/api/auth/plan', { planId: 'lite' });
-  const date = '2026-10-19'; // первый день: Мк 1:1-20, порог 30 c (минимум)
+  const date = '2026-10-19'; // первый день: Мк 1:1-20, порог 40 секунд
 
   const info = await c('GET', `/api/reading/lite/${date}`);
   assert.equal(info.status, 200);
   assert.equal(info.data.verses.length, 20);
-  assert.equal(info.data.thresholdSeconds, 30);
+  assert.equal(info.data.thresholdSeconds, 40);
 
   // Огромное число секунд клампится разумным максимумом.
   const credited = await c('POST', '/api/reading/progress', { planId: 'lite', date, seconds: 9999, reachedEnd: true });
@@ -189,7 +189,7 @@ test('недостаточное время не зачитывается', asyn
   const c = makeClient();
   await c('POST', '/api/auth/register', { login: 'test_slow', password: '123' });
   await c('POST', '/api/auth/plan', { planId: 'lite' });
-  const date = '2026-10-21'; // Мк 1:21-45, порог 50 c
+  const date = '2026-10-21'; // Мк 1:21-45, порог 50 секунд
   const r = await c('POST', '/api/reading/progress', { planId: 'lite', date, seconds: 5, reachedEnd: true });
   assert.equal(r.data.progress.readAt, null);
   assert.equal(r.data.status, 'neutral');

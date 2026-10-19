@@ -166,11 +166,7 @@ body {
 .like-btn.liked { color: var(--miss); font-weight: 600; }
 
 .reader-progress {
-  position: sticky;
-  top: 0;
-  z-index: 1020;
   background: rgba(246, 247, 249, 0.95);
-  backdrop-filter: blur(4px);
   padding: 6px 0;
   font-size: 0.78rem;
   color: var(--muted);
@@ -518,12 +514,13 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 .reading-page { padding-bottom: 30px !important; }
 .reading-title { font-size: clamp(1.4rem, 5vw, 1.8rem); font-weight: 700; line-height: 1.2; }
 .reader-progress {
-  top: env(safe-area-inset-top);
+  position: static;
   margin: 8px -0.35rem 0;
   padding: 9px 10px;
   border: 1px solid rgba(231, 229, 220, 0.8);
   border-radius: 13px;
   background: rgba(245, 244, 239, 0.96);
+  backdrop-filter: none;
   font-size: 0.82rem;
 }
 .reading-timer { min-width: 46px; text-align: right; color: var(--brand); font-variant-numeric: tabular-nums; font-weight: 700; }

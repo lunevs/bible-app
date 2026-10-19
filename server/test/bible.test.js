@@ -18,13 +18,13 @@ test('отрывок Мк 1:1-20 содержит 20 стихов', () => {
   assert.equal(getPassageVerses(day.passage.ranges).length, 20);
 });
 
-test('порог = max(минимум, 1 сек × стихи); для 20 стихов это 30 секунд (минимум)', () => {
+test('порог чтения = 2 секунды на стих; для 20 стихов это 40 секунд', () => {
   const day = getPlan('lite').days[0];
   assert.equal(
     thresholdFor(day.passage.ranges),
-    Math.max(config.reading.minSeconds, 1 * 20)
+    Math.max(config.reading.minSeconds, 2 * 20)
   );
-  assert.equal(thresholdFor(day.passage.ranges), 30);
+  assert.equal(thresholdFor(day.passage.ranges), 40);
 });
 
 test('составной рождественский отрывок (Лк 2:1-20 + Ин 1:14) = 21 стих', () => {
@@ -40,8 +40,8 @@ test('главный стих дня возвращает текст', () => {
   assert.ok(v && v.text.length > 0);
 });
 
-test('короткий отрывок упирается в минимальный порог (30 секунд)', () => {
-  // Искусственный диапазон из 3 стихов: 2×3=6 < 30 → порог 30.
+test('для короткого отрывка порог тоже равен двум секундам на стих', () => {
+  // Искусственный диапазон из 3 стихов: 3×2 = 6 секунд.
   const ranges = [{ book: 'Ин', startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 3 }];
-  assert.equal(thresholdFor(ranges), 30);
+  assert.equal(thresholdFor(ranges), 6);
 });
