@@ -135,12 +135,18 @@ test('выбор плана и предупреждение при смене', 
   assert.equal(changeConfirm.data.user.planId, 'hard');
 });
 
-test('список планов содержит 30/50/68 записей', async () => {
+test('список планов содержит четыре актуальных плана', async () => {
   const c = makeClient();
   await c('POST', '/api/auth/register', { login: 'test_planner', password: '123' });
   const { data } = await c('GET', '/api/plans');
   const counts = Object.fromEntries(data.plans.map((p) => [p.id, p.days]));
-  assert.deepEqual(counts, { lite: 30, standard: 50, hard: 68 });
+  assert.deepEqual(counts, { lite: 30, standard: 50, advanced: 50, hard: 68 });
+  assert.equal(data.plans.find((p) => p.id === 'standard').name, 'Стандарт');
+  // В общей рождественской записи также есть Лк 2.
+  assert.deepEqual(data.plans.find((p) => p.id === 'standard').books, ['Ин', 'Лк']);
+  assert.equal(data.plans.find((p) => p.id === 'advanced').name, 'Продвинутый');
+  // В рождественский день ко всем планам добавляется чтение Лк 2.
+  assert.deepEqual(data.plans.find((p) => p.id === 'advanced').books, ['Мк', 'Ин', 'Лк']);
 });
 
 test('прогресс по плану: все дни со статусами и подписями', async () => {

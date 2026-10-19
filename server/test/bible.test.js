@@ -6,10 +6,13 @@ import { verseCount, getPassageVerses, getVerse } from '../src/bible.js';
 import { thresholdFor } from '../src/routes/reading.js';
 import { config } from '../src/config.js';
 
-test('планы загружаются: 30 / 50 / 68 записей', () => {
+test('планы загружаются: lite 30, standard 50, advanced 50, hard 68 записей', () => {
   assert.equal(getPlan('lite').days.length, 30);
   assert.equal(getPlan('standard').days.length, 50);
+  assert.equal(getPlan('advanced').days.length, 50);
   assert.equal(getPlan('hard').days.length, 68);
+  assert.equal(getPlan('standard').books[0], 'Ин');
+  assert.deepEqual(getPlan('advanced').books, ['Мк', 'Ин']);
 });
 
 test('отрывок Мк 1:1-20 содержит 20 стихов', () => {

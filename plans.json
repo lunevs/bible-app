@@ -12,14 +12,21 @@
    "Дата 2026-12-25 во всех планах — рождественский день вне основного чтения (special: christmas).",
    "endVerse = null означает «до конца главы»; startVerse = null означает «с начала главы».",
    "readingWeekdays: 0 = воскресенье, 1 = понедельник. Дни вне этого списка в плане отсутствуют.",
-   "thought = null у плана «Хард» (ключевые мысли для него не составлялись)."
+   "thought = null у плана «Хард» (ключевые мысли для него не составлялись).",
+   "description — краткое описание плана для показа пользователю; gospels, minutesPerDay (в среднем на отрывок), daysPerWeek и books повторяют его в структурном виде."
   ]
  },
  "plans": [
   {
    "id": "lite",
    "name": "Лайт",
-   "description": "1 Евангелие, три раза в неделю по 10 минут",
+   "description": "1 Евангелие по 5 минут, 3 дня в неделю",
+   "gospels": 1,
+   "minutesPerDay": 5,
+   "daysPerWeek": 3,
+   "books": [
+    "Мк"
+   ],
    "readingWeekdays": [
     1,
     3,
@@ -699,7 +706,1142 @@
   {
    "id": "standard",
    "name": "Стандарт",
-   "description": "2 Евангелия, по будням по 12 минут",
+   "description": "1 Евангелие по 4 минуты, 5 дней в неделю",
+   "gospels": 1,
+   "minutesPerDay": 4,
+   "daysPerWeek": 5,
+   "books": [
+    "Ин"
+   ],
+   "readingWeekdays": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "days": [
+    {
+     "date": "2026-10-19",
+     "passage": {
+      "label": "Ин 1:1-18",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 1,
+        "startVerse": 1,
+        "endChapter": 1,
+        "endVerse": 18
+       }
+      ]
+     },
+     "thought": "Слово стало плотью: Бог пришёл жить среди нас",
+     "mainVerse": {
+      "label": "Ин 1:14",
+      "book": "Ин",
+      "chapter": 1,
+      "verse": 14
+     }
+    },
+    {
+     "date": "2026-10-20",
+     "passage": {
+      "label": "Ин 1:19-34",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 1,
+        "startVerse": 19,
+        "endChapter": 1,
+        "endVerse": 34
+       }
+      ]
+     },
+     "thought": "Иоанн указывает на Иисуса: «Агнец Божий»",
+     "mainVerse": {
+      "label": "Ин 1:29",
+      "book": "Ин",
+      "chapter": 1,
+      "verse": 29
+     }
+    },
+    {
+     "date": "2026-10-21",
+     "passage": {
+      "label": "Ин 1:35-51",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 1,
+        "startVerse": 35,
+        "endChapter": 1,
+        "endVerse": 51
+       }
+      ]
+     },
+     "thought": "Первые ученики: приглашение прийти и увидеть",
+     "mainVerse": {
+      "label": "Ин 1:39",
+      "book": "Ин",
+      "chapter": 1,
+      "verse": 39
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "passage": {
+      "label": "Ин 2:1-12",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 2,
+        "startVerse": 1,
+        "endChapter": 2,
+        "endVerse": 12
+       }
+      ]
+     },
+     "thought": "Первое знамение в Кане: Иисус являет славу",
+     "mainVerse": {
+      "label": "Ин 2:11",
+      "book": "Ин",
+      "chapter": 2,
+      "verse": 11
+     }
+    },
+    {
+     "date": "2026-10-23",
+     "passage": {
+      "label": "Ин 2:13-25",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 2,
+        "startVerse": 13,
+        "endChapter": 2,
+        "endVerse": 25
+       }
+      ]
+     },
+     "thought": "Иисус очищает храм и говорит о Своём воскресении",
+     "mainVerse": {
+      "label": "Ин 2:19",
+      "book": "Ин",
+      "chapter": 2,
+      "verse": 19
+     }
+    },
+    {
+     "date": "2026-10-26",
+     "passage": {
+      "label": "Ин 3:1-15",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 3,
+        "startVerse": 1,
+        "endChapter": 3,
+        "endVerse": 15
+       }
+      ]
+     },
+     "thought": "Никодим: нужно родиться свыше",
+     "mainVerse": {
+      "label": "Ин 3:3",
+      "book": "Ин",
+      "chapter": 3,
+      "verse": 3
+     }
+    },
+    {
+     "date": "2026-10-27",
+     "passage": {
+      "label": "Ин 3:16-36",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 3,
+        "startVerse": 16,
+        "endChapter": 3,
+        "endVerse": 36
+       }
+      ]
+     },
+     "thought": "Бог так возлюбил мир; вера в Сына даёт жизнь",
+     "mainVerse": {
+      "label": "Ин 3:16",
+      "book": "Ин",
+      "chapter": 3,
+      "verse": 16
+     }
+    },
+    {
+     "date": "2026-10-28",
+     "passage": {
+      "label": "Ин 4:1-26",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 4,
+        "startVerse": 1,
+        "endChapter": 4,
+        "endVerse": 26
+       }
+      ]
+     },
+     "thought": "Самарянка: живая вода и поклонение в духе и истине",
+     "mainVerse": {
+      "label": "Ин 4:24",
+      "book": "Ин",
+      "chapter": 4,
+      "verse": 24
+     }
+    },
+    {
+     "date": "2026-10-29",
+     "passage": {
+      "label": "Ин 4:27-42",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 4,
+        "startVerse": 27,
+        "endChapter": 4,
+        "endVerse": 42
+       }
+      ]
+     },
+     "thought": "Женщина рассказывает о Нём, и самаряне верят",
+     "mainVerse": {
+      "label": "Ин 4:42",
+      "book": "Ин",
+      "chapter": 4,
+      "verse": 42
+     }
+    },
+    {
+     "date": "2026-10-30",
+     "passage": {
+      "label": "Ин 4:43-54",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 4,
+        "startVerse": 43,
+        "endChapter": 4,
+        "endVerse": 54
+       }
+      ]
+     },
+     "thought": "Царедворец верит слову Иисуса, и сын выздоравливает",
+     "mainVerse": {
+      "label": "Ин 4:50",
+      "book": "Ин",
+      "chapter": 4,
+      "verse": 50
+     }
+    },
+    {
+     "date": "2026-11-02",
+     "passage": {
+      "label": "Ин 5:1-18",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 5,
+        "startVerse": 1,
+        "endChapter": 5,
+        "endVerse": 18
+       }
+      ]
+     },
+     "thought": "Исцеление больного: «хочешь ли быть здоров?»",
+     "mainVerse": {
+      "label": "Ин 5:6",
+      "book": "Ин",
+      "chapter": 5,
+      "verse": 6
+     }
+    },
+    {
+     "date": "2026-11-03",
+     "passage": {
+      "label": "Ин 5:19-47",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 5,
+        "startVerse": 19,
+        "endChapter": 5,
+        "endVerse": 47
+       }
+      ]
+     },
+     "thought": "Власть Сына; Писание свидетельствует об Иисусе",
+     "mainVerse": {
+      "label": "Ин 5:39",
+      "book": "Ин",
+      "chapter": 5,
+      "verse": 39
+     }
+    },
+    {
+     "date": "2026-11-04",
+     "passage": {
+      "label": "Ин 6:1-21",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 6,
+        "startVerse": 1,
+        "endChapter": 6,
+        "endVerse": 21
+       }
+      ]
+     },
+     "thought": "Пять хлебов и хождение по воде: не бойтесь",
+     "mainVerse": {
+      "label": "Ин 6:20",
+      "book": "Ин",
+      "chapter": 6,
+      "verse": 20
+     }
+    },
+    {
+     "date": "2026-11-05",
+     "passage": {
+      "label": "Ин 6:22-40",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 6,
+        "startVerse": 22,
+        "endChapter": 6,
+        "endVerse": 40
+       }
+      ]
+     },
+     "thought": "Иисус — хлеб жизни",
+     "mainVerse": {
+      "label": "Ин 6:35",
+      "book": "Ин",
+      "chapter": 6,
+      "verse": 35
+     }
+    },
+    {
+     "date": "2026-11-06",
+     "passage": {
+      "label": "Ин 6:41-59",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 6,
+        "startVerse": 41,
+        "endChapter": 6,
+        "endVerse": 59
+       }
+      ]
+     },
+     "thought": "Трудные слова о хлебе с небес",
+     "mainVerse": {
+      "label": "Ин 6:51",
+      "book": "Ин",
+      "chapter": 6,
+      "verse": 51
+     }
+    },
+    {
+     "date": "2026-11-09",
+     "passage": {
+      "label": "Ин 6:60-71",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 6,
+        "startVerse": 60,
+        "endChapter": 6,
+        "endVerse": 71
+       }
+      ]
+     },
+     "thought": "Многие уходят, Пётр остаётся: «к кому пойдём?»",
+     "mainVerse": {
+      "label": "Ин 6:68",
+      "book": "Ин",
+      "chapter": 6,
+      "verse": 68
+     }
+    },
+    {
+     "date": "2026-11-10",
+     "passage": {
+      "label": "Ин 7:1-24",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 7,
+        "startVerse": 1,
+        "endChapter": 7,
+        "endVerse": 24
+       }
+      ]
+     },
+     "thought": "Кто хочет творить волю Бога, узнает об учении",
+     "mainVerse": {
+      "label": "Ин 7:17",
+      "book": "Ин",
+      "chapter": 7,
+      "verse": 17
+     }
+    },
+    {
+     "date": "2026-11-11",
+     "passage": {
+      "label": "Ин 7:25-52",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 7,
+        "startVerse": 25,
+        "endChapter": 7,
+        "endVerse": 52
+       }
+      ]
+     },
+     "thought": "Праздник кущей: приходите и пейте",
+     "mainVerse": {
+      "label": "Ин 7:37",
+      "book": "Ин",
+      "chapter": 7,
+      "verse": 37
+     }
+    },
+    {
+     "date": "2026-11-12",
+     "passage": {
+      "label": "Ин 7:53 – 8:11",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 7,
+        "startVerse": 53,
+        "endChapter": 8,
+        "endVerse": 11
+       }
+      ]
+     },
+     "thought": "Милость Иисуса к женщине и призыв не грешить",
+     "mainVerse": {
+      "label": "Ин 8:11",
+      "book": "Ин",
+      "chapter": 8,
+      "verse": 11
+     }
+    },
+    {
+     "date": "2026-11-13",
+     "passage": {
+      "label": "Ин 8:12-30",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 8,
+        "startVerse": 12,
+        "endChapter": 8,
+        "endVerse": 30
+       }
+      ]
+     },
+     "thought": "Иисус — свет миру",
+     "mainVerse": {
+      "label": "Ин 8:12",
+      "book": "Ин",
+      "chapter": 8,
+      "verse": 12
+     }
+    },
+    {
+     "date": "2026-11-16",
+     "passage": {
+      "label": "Ин 8:31-47",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 8,
+        "startVerse": 31,
+        "endChapter": 8,
+        "endVerse": 47
+       }
+      ]
+     },
+     "thought": "Истина делает свободным",
+     "mainVerse": {
+      "label": "Ин 8:32",
+      "book": "Ин",
+      "chapter": 8,
+      "verse": 32
+     }
+    },
+    {
+     "date": "2026-11-17",
+     "passage": {
+      "label": "Ин 8:48-59",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 8,
+        "startVerse": 48,
+        "endChapter": 8,
+        "endVerse": 59
+       }
+      ]
+     },
+     "thought": "«Прежде Авраама Я есмь»",
+     "mainVerse": {
+      "label": "Ин 8:58",
+      "book": "Ин",
+      "chapter": 8,
+      "verse": 58
+     }
+    },
+    {
+     "date": "2026-11-18",
+     "passage": {
+      "label": "Ин 9:1-23",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 9,
+        "startVerse": 1,
+        "endChapter": 9,
+        "endVerse": 23
+       }
+      ]
+     },
+     "thought": "Иисус возвращает зрение слепорождённому",
+     "mainVerse": {
+      "label": "Ин 9:5",
+      "book": "Ин",
+      "chapter": 9,
+      "verse": 5
+     }
+    },
+    {
+     "date": "2026-11-19",
+     "passage": {
+      "label": "Ин 9:24-41",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 9,
+        "startVerse": 24,
+        "endChapter": 9,
+        "endVerse": 41
+       }
+      ]
+     },
+     "thought": "«Был слеп, а теперь вижу»",
+     "mainVerse": {
+      "label": "Ин 9:25",
+      "book": "Ин",
+      "chapter": 9,
+      "verse": 25
+     }
+    },
+    {
+     "date": "2026-11-20",
+     "passage": {
+      "label": "Ин 10:1-21",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 10,
+        "startVerse": 1,
+        "endChapter": 10,
+        "endVerse": 21
+       }
+      ]
+     },
+     "thought": "Добрый Пастырь отдаёт жизнь за овец",
+     "mainVerse": {
+      "label": "Ин 10:11",
+      "book": "Ин",
+      "chapter": 10,
+      "verse": 11
+     }
+    },
+    {
+     "date": "2026-11-23",
+     "passage": {
+      "label": "Ин 10:22-42",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 10,
+        "startVerse": 22,
+        "endChapter": 10,
+        "endVerse": 42
+       }
+      ]
+     },
+     "thought": "Овцы слышат Его голос",
+     "mainVerse": {
+      "label": "Ин 10:27",
+      "book": "Ин",
+      "chapter": 10,
+      "verse": 27
+     }
+    },
+    {
+     "date": "2026-11-24",
+     "passage": {
+      "label": "Ин 11:1-27",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 11,
+        "startVerse": 1,
+        "endChapter": 11,
+        "endVerse": 27
+       }
+      ]
+     },
+     "thought": "Лазарь заболел: «Я есмь воскресение и жизнь»",
+     "mainVerse": {
+      "label": "Ин 11:25",
+      "book": "Ин",
+      "chapter": 11,
+      "verse": 25
+     }
+    },
+    {
+     "date": "2026-11-25",
+     "passage": {
+      "label": "Ин 11:28-57",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 11,
+        "startVerse": 28,
+        "endChapter": 11,
+        "endVerse": 57
+       }
+      ]
+     },
+     "thought": "Иисус плачет у гроба и воскрешает Лазаря",
+     "mainVerse": {
+      "label": "Ин 11:40",
+      "book": "Ин",
+      "chapter": 11,
+      "verse": 40
+     }
+    },
+    {
+     "date": "2026-11-26",
+     "passage": {
+      "label": "Ин 12:1-19",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 12,
+        "startVerse": 1,
+        "endChapter": 12,
+        "endVerse": 19
+       }
+      ]
+     },
+     "thought": "Помазание в Вифании и вход в Иерусалим",
+     "mainVerse": {
+      "label": "Ин 12:13",
+      "book": "Ин",
+      "chapter": 12,
+      "verse": 13
+     }
+    },
+    {
+     "date": "2026-11-27",
+     "passage": {
+      "label": "Ин 12:20-36",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 12,
+        "startVerse": 20,
+        "endChapter": 12,
+        "endVerse": 36
+       }
+      ]
+     },
+     "thought": "Зерно, которое умирает ради плода",
+     "mainVerse": {
+      "label": "Ин 12:24",
+      "book": "Ин",
+      "chapter": 12,
+      "verse": 24
+     }
+    },
+    {
+     "date": "2026-11-30",
+     "passage": {
+      "label": "Ин 12:37-50",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 12,
+        "startVerse": 37,
+        "endChapter": 12,
+        "endVerse": 50
+       }
+      ]
+     },
+     "thought": "Неверие и вера; Иисус пришёл как свет",
+     "mainVerse": {
+      "label": "Ин 12:46",
+      "book": "Ин",
+      "chapter": 12,
+      "verse": 46
+     }
+    },
+    {
+     "date": "2026-12-01",
+     "passage": {
+      "label": "Ин 13:1-20",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 13,
+        "startVerse": 1,
+        "endChapter": 13,
+        "endVerse": 20
+       }
+      ]
+     },
+     "thought": "Господь омывает ноги ученикам",
+     "mainVerse": {
+      "label": "Ин 13:14",
+      "book": "Ин",
+      "chapter": 13,
+      "verse": 14
+     }
+    },
+    {
+     "date": "2026-12-02",
+     "passage": {
+      "label": "Ин 13:21-38",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 13,
+        "startVerse": 21,
+        "endChapter": 13,
+        "endVerse": 38
+       }
+      ]
+     },
+     "thought": "Новая заповедь: любите друг друга",
+     "mainVerse": {
+      "label": "Ин 13:34",
+      "book": "Ин",
+      "chapter": 13,
+      "verse": 34
+     }
+    },
+    {
+     "date": "2026-12-03",
+     "passage": {
+      "label": "Ин 14:1-14",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 14,
+        "startVerse": 1,
+        "endChapter": 14,
+        "endVerse": 14
+       }
+      ]
+     },
+     "thought": "«Да не смущается сердце»: Иисус — путь",
+     "mainVerse": {
+      "label": "Ин 14:6",
+      "book": "Ин",
+      "chapter": 14,
+      "verse": 6
+     }
+    },
+    {
+     "date": "2026-12-04",
+     "passage": {
+      "label": "Ин 14:15-31",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 14,
+        "startVerse": 15,
+        "endChapter": 14,
+        "endVerse": 31
+       }
+      ]
+     },
+     "thought": "Обещан Утешитель; мир, который даёт Иисус",
+     "mainVerse": {
+      "label": "Ин 14:27",
+      "book": "Ин",
+      "chapter": 14,
+      "verse": 27
+     }
+    },
+    {
+     "date": "2026-12-07",
+     "passage": {
+      "label": "Ин 15:1-17",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 15,
+        "startVerse": 1,
+        "endChapter": 15,
+        "endVerse": 17
+       }
+      ]
+     },
+     "thought": "Лоза и ветви",
+     "mainVerse": {
+      "label": "Ин 15:5",
+      "book": "Ин",
+      "chapter": 15,
+      "verse": 5
+     }
+    },
+    {
+     "date": "2026-12-08",
+     "passage": {
+      "label": "Ин 15:18 – 16:4",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 15,
+        "startVerse": 18,
+        "endChapter": 16,
+        "endVerse": 4
+       }
+      ]
+     },
+     "thought": "Мир отвергнет учеников, как отверг Иисуса",
+     "mainVerse": {
+      "label": "Ин 15:19",
+      "book": "Ин",
+      "chapter": 15,
+      "verse": 19
+     }
+    },
+    {
+     "date": "2026-12-09",
+     "passage": {
+      "label": "Ин 16:5-15",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 16,
+        "startVerse": 5,
+        "endChapter": 16,
+        "endVerse": 15
+       }
+      ]
+     },
+     "thought": "Дух Святой ведёт в истину",
+     "mainVerse": {
+      "label": "Ин 16:13",
+      "book": "Ин",
+      "chapter": 16,
+      "verse": 13
+     }
+    },
+    {
+     "date": "2026-12-10",
+     "passage": {
+      "label": "Ин 16:16-33",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 16,
+        "startVerse": 16,
+        "endChapter": 16,
+        "endVerse": 33
+       }
+      ]
+     },
+     "thought": "Скорбь пройдёт; в Иисусе есть мир",
+     "mainVerse": {
+      "label": "Ин 16:33",
+      "book": "Ин",
+      "chapter": 16,
+      "verse": 33
+     }
+    },
+    {
+     "date": "2026-12-11",
+     "passage": {
+      "label": "Ин 17:1-26",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 17,
+        "startVerse": 1,
+        "endChapter": 17,
+        "endVerse": 26
+       }
+      ]
+     },
+     "thought": "Молитва Иисуса за учеников и за всех верующих",
+     "mainVerse": {
+      "label": "Ин 17:17",
+      "book": "Ин",
+      "chapter": 17,
+      "verse": 17
+     }
+    },
+    {
+     "date": "2026-12-14",
+     "passage": {
+      "label": "Ин 18:1-27",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 18,
+        "startVerse": 1,
+        "endChapter": 18,
+        "endVerse": 27
+       }
+      ]
+     },
+     "thought": "Арест в саду и отречение Петра",
+     "mainVerse": {
+      "label": "Ин 18:11",
+      "book": "Ин",
+      "chapter": 18,
+      "verse": 11
+     }
+    },
+    {
+     "date": "2026-12-15",
+     "passage": {
+      "label": "Ин 18:28-40",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 18,
+        "startVerse": 28,
+        "endChapter": 18,
+        "endVerse": 40
+       }
+      ]
+     },
+     "thought": "Перед Пилатом: Царство Иисуса не от мира",
+     "mainVerse": {
+      "label": "Ин 18:37",
+      "book": "Ин",
+      "chapter": 18,
+      "verse": 37
+     }
+    },
+    {
+     "date": "2026-12-16",
+     "passage": {
+      "label": "Ин 19:1-16",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 19,
+        "startVerse": 1,
+        "endChapter": 19,
+        "endVerse": 16
+       }
+      ]
+     },
+     "thought": "Бичевание и приговор: «се, Человек»",
+     "mainVerse": {
+      "label": "Ин 19:5",
+      "book": "Ин",
+      "chapter": 19,
+      "verse": 5
+     }
+    },
+    {
+     "date": "2026-12-17",
+     "passage": {
+      "label": "Ин 19:17-30",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 19,
+        "startVerse": 17,
+        "endChapter": 19,
+        "endVerse": 30
+       }
+      ]
+     },
+     "thought": "Крест: «Совершилось!»",
+     "mainVerse": {
+      "label": "Ин 19:30",
+      "book": "Ин",
+      "chapter": 19,
+      "verse": 30
+     }
+    },
+    {
+     "date": "2026-12-18",
+     "passage": {
+      "label": "Ин 19:31-42",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 19,
+        "startVerse": 31,
+        "endChapter": 19,
+        "endVerse": 42
+       }
+      ]
+     },
+     "thought": "Смерть Иисуса подтверждена, погребение",
+     "mainVerse": {
+      "label": "Ин 19:35",
+      "book": "Ин",
+      "chapter": 19,
+      "verse": 35
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "passage": {
+      "label": "Ин 20:1-18",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 20,
+        "startVerse": 1,
+        "endChapter": 20,
+        "endVerse": 18
+       }
+      ]
+     },
+     "thought": "Мария слышит своё имя и узнаёт Господа",
+     "mainVerse": {
+      "label": "Ин 20:16",
+      "book": "Ин",
+      "chapter": 20,
+      "verse": 16
+     }
+    },
+    {
+     "date": "2026-12-22",
+     "passage": {
+      "label": "Ин 20:19-31",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 20,
+        "startVerse": 19,
+        "endChapter": 20,
+        "endVerse": 31
+       }
+      ]
+     },
+     "thought": "Фома; зачем написана эта книга",
+     "mainVerse": {
+      "label": "Ин 20:31",
+      "book": "Ин",
+      "chapter": 20,
+      "verse": 31
+     }
+    },
+    {
+     "date": "2026-12-23",
+     "passage": {
+      "label": "Ин 21:1-14",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 21,
+        "startVerse": 1,
+        "endChapter": 21,
+        "endVerse": 14
+       }
+      ]
+     },
+     "thought": "Рыбалка и завтрак с воскресшим Господом",
+     "mainVerse": {
+      "label": "Ин 21:7",
+      "book": "Ин",
+      "chapter": 21,
+      "verse": 7
+     }
+    },
+    {
+     "date": "2026-12-24",
+     "passage": {
+      "label": "Ин 21:15-25",
+      "ranges": [
+       {
+        "book": "Ин",
+        "startChapter": 21,
+        "startVerse": 15,
+        "endChapter": 21,
+        "endVerse": 25
+       }
+      ]
+     },
+     "thought": "Восстановление Петра: «Паси овец Моих»",
+     "mainVerse": {
+      "label": "Ин 21:17",
+      "book": "Ин",
+      "chapter": 21,
+      "verse": 17
+     }
+    },
+    {
+     "date": "2026-12-25",
+     "passage": {
+      "label": "Лк 2:1-20; Ин 1:14",
+      "ranges": [
+       {
+        "book": "Лк",
+        "startChapter": 2,
+        "startVerse": 1,
+        "endChapter": 2,
+        "endVerse": 20
+       },
+       {
+        "book": "Ин",
+        "startChapter": 1,
+        "startVerse": 14,
+        "endChapter": 1,
+        "endVerse": 14
+       }
+      ]
+     },
+     "thought": "Рождество: Он пришёл в мир",
+     "mainVerse": {
+      "label": "Лк 2:11",
+      "book": "Лк",
+      "chapter": 2,
+      "verse": 11
+     },
+     "special": "christmas"
+    }
+   ]
+  },
+  {
+   "id": "advanced",
+   "name": "Продвинутый",
+   "description": "2 Евангелия по 8 минут, 5 дней в неделю",
+   "gospels": 2,
+   "minutesPerDay": 8,
+   "daysPerWeek": 5,
+   "books": [
+    "Мк",
+    "Ин"
+   ],
    "readingWeekdays": [
     1,
     2,
@@ -1821,7 +2963,16 @@
   {
    "id": "hard",
    "name": "Хард",
-   "description": "Все Евангелия, каждый день по 15 минут",
+   "description": "4 Евангелия по 15 минут, 7 дней в неделю",
+   "gospels": 4,
+   "minutesPerDay": 15,
+   "daysPerWeek": 7,
+   "books": [
+    "Мк",
+    "Мф",
+    "Лк",
+    "Ин"
+   ],
    "readingWeekdays": [
     0,
     1,
