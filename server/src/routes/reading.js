@@ -162,9 +162,10 @@ readingRouter.post('/reading/progress', requireAuth, (req, res) => {
     .prepare('SELECT seconds, reached_end, read_at FROM reading_progress WHERE user_id = ? AND plan_id = ? AND plan_date = ?')
     .get(req.user.id, planId, date);
 
-  const seconds = (existing?.seconds || 0) + delta;
   const reached = Math.max(existing?.reached_end || 0, reachedEnd);
   const threshold = thresholdFor(day.passage.ranges);
+  // Суммарные секунды сохраняются для возобновления таймера, но не растут сверх порога.
+  const seconds = Math.min(threshold, (existing?.seconds || 0) + delta);
 
   let readAt = existing?.read_at ?? null;
   if (readAt == null && reached === 1 && seconds >= threshold) readAt = ts;

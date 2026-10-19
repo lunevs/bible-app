@@ -6,9 +6,10 @@ import { api } from '../api.js';
 // (прокрутка, касание, движение). Плюс отслеживание «дошёл до конца».
 export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, thresholdSeconds, onStatus }) {
   const [seconds, setSeconds] = useState(initialSeconds); // всего накоплено (включая прошлые сеансы)
-  // Таймер интерфейса каждый раз начинает полный отсчёт для текущего открытия.
-  const [remainingSeconds, setRemainingSeconds] = useState(enabled ? thresholdSeconds : 0);
-  const remainingRef = useRef(enabled ? thresholdSeconds : 0);
+  // Продолжаем таймер с накопленного сервером активного времени при повторном открытии.
+  const initialRemaining = enabled ? Math.max(0, thresholdSeconds - initialSeconds) : 0;
+  const [remainingSeconds, setRemainingSeconds] = useState(initialRemaining);
+  const remainingRef = useRef(initialRemaining);
   const creditedRef = useRef(!enabled);
   const [status, setStatus] = useState(null);
   const [reachedEnd, setReachedEnd] = useState(false);
@@ -59,12 +60,10 @@ export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, t
     const tick = setInterval(() => {
       if (!visibleRef.current) return;
       if (Date.now() - lastActivityRef.current >= IDLE_MS) return;
-      if (enabledRef.current && !creditedRef.current) {
+      if (enabledRef.current && !creditedRef.current && remainingRef.current > 0) {
         secondsRef.current += 1;
         unsentRef.current += 1;
         setSeconds(secondsRef.current);
-      }
-      if (remainingRef.current > 0) {
         remainingRef.current -= 1;
         setRemainingSeconds(remainingRef.current);
       }

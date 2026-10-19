@@ -167,7 +167,7 @@ test('today отдаёт списки readDays и missedDays', async () => {
 
 // --- Чтение и зачёт ---
 
-test('зачёт чтения: кламп секунд, порог и зелёный статус', async () => {
+test('зачёт чтения: суммарное время ограничено порогом, зачёт даёт зелёный статус', async () => {
   const c = makeClient();
   await c('POST', '/api/auth/register', { login: 'test_reader', password: '123' });
   await c('POST', '/api/auth/plan', { planId: 'lite' });
@@ -178,9 +178,9 @@ test('зачёт чтения: кламп секунд, порог и зелён
   assert.equal(info.data.verses.length, 20);
   assert.equal(info.data.thresholdSeconds, 40);
 
-  // Огромное число секунд клампится разумным максимумом.
+  // Одним запросом нельзя накопить больше порога отрывка.
   const credited = await c('POST', '/api/reading/progress', { planId: 'lite', date, seconds: 9999, reachedEnd: true });
-  assert.equal(credited.data.progress.seconds, config.reading.maxSecondsPerRequest);
+  assert.equal(credited.data.progress.seconds, info.data.thresholdSeconds);
   assert.equal(credited.data.status, 'green');
   assert.ok(credited.data.progress.readAt);
 });
@@ -193,6 +193,37 @@ test('недостаточное время не зачитывается', asyn
   const r = await c('POST', '/api/reading/progress', { planId: 'lite', date, seconds: 5, reachedEnd: true });
   assert.equal(r.data.progress.readAt, null);
   assert.equal(r.data.status, 'neutral');
+});
+
+test('активное время восстанавливает обратный таймер после повторного открытия', async () => {
+  const c = makeClient();
+  await c('POST', '/api/auth/register', { login: 'test_resume_timer', password: '123' });
+  await c('POST', '/api/auth/plan', { planId: 'lite' });
+  const date = '2026-10-19';
+
+  const firstSession = await c('POST', '/api/reading/progress', {
+    planId: 'lite', date, seconds: 24, reachedEnd: false,
+  });
+  assert.equal(firstSession.data.progress.seconds, 24);
+  assert.equal(firstSession.data.progress.readAt, null);
+
+  // GET, как при повторном входе на экран, отдаёт уже накопленные секунды.
+  const reopened = await c('GET', `/api/reading/lite/${date}`);
+  assert.equal(reopened.data.progress.seconds, 24);
+  assert.equal(reopened.data.thresholdSeconds - reopened.data.progress.seconds, 16);
+
+  const completed = await c('POST', '/api/reading/progress', {
+    planId: 'lite', date, seconds: 16, reachedEnd: true,
+  });
+  assert.equal(completed.data.progress.seconds, 40);
+  assert.ok(completed.data.progress.readAt);
+  assert.ok(['green', 'blue'].includes(completed.data.status));
+
+  // После достижения порога дополнительные секунды не накапливаются.
+  const afterThreshold = await c('POST', '/api/reading/progress', {
+    planId: 'lite', date, seconds: 30, reachedEnd: true,
+  });
+  assert.equal(afterThreshold.data.progress.seconds, 40);
 });
 
 test('достижение конца без времени не зачитывается', async () => {
