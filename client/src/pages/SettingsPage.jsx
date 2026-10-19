@@ -1,9 +1,38 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { formatDate } from '../dates.js';
+import { api } from '../api.js';
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
+  const [password, setPassword] = useState('');
+  const [passwordRepeat, setPasswordRepeat] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const changePassword = async (event) => {
+    event.preventDefault();
+    setMessage('');
+    setError('');
+    if (password !== passwordRepeat) {
+      setError('Пароли не совпадают. Проверьте оба поля.');
+      return;
+    }
+
+    setBusy(true);
+    try {
+      await api.post('/auth/change-password', { password, passwordRepeat });
+      setPassword('');
+      setPasswordRepeat('');
+      setMessage('Пароль успешно изменён.');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="container py-3">
@@ -24,12 +53,41 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      <form className="card-soft p-3 mb-3" onSubmit={changePassword}>
+        <h2 className="h6 mb-3">Сменить пароль</h2>
+        <label className="form-label" htmlFor="new-password">Новый пароль</label>
+        <input
+          id="new-password"
+          className="form-control mb-3"
+          type="password"
+          autoComplete="new-password"
+          minLength={3}
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <label className="form-label" htmlFor="repeat-password">Повторите новый пароль</label>
+        <input
+          id="repeat-password"
+          className="form-control mb-3"
+          type="password"
+          autoComplete="new-password"
+          minLength={3}
+          required
+          value={passwordRepeat}
+          onChange={(e) => setPasswordRepeat(e.target.value)}
+        />
+        {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
+        {message && <div className="alert alert-success py-2" role="status">{message}</div>}
+        <button className="btn btn-brand w-100" type="submit" disabled={busy || !password || !passwordRepeat}>
+          {busy ? 'Сохраняем…' : 'Сменить пароль'}
+        </button>
+        <div className="form-text mt-2">Старый пароль вводить не нужно. Минимальная длина — 3 символа.</div>
+      </form>
+
       <div className="d-grid gap-2">
         <Link className="btn btn-outline-secondary" to="/plans">
           План чтения
-        </Link>
-        <Link className="btn btn-outline-secondary" to="/notes">
-          Открытые заметки группы
         </Link>
         {user.role === 'admin' && (
           <Link className="btn btn-outline-secondary" to="/admin">

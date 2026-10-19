@@ -65,6 +65,25 @@ authRouter.post('/login', (req, res) => {
   res.json({ user: publicUser(user) });
 });
 
+authRouter.post('/change-password', requireAuth, (req, res) => {
+  const password = String(req.body?.password || '');
+  const passwordRepeat = String(req.body?.passwordRepeat || '');
+
+  if (password.length < config.auth.minPasswordLength) {
+    return res.status(400).json({ error: `Пароль не короче ${config.auth.minPasswordLength} символов` });
+  }
+  if (password !== passwordRepeat) {
+    return res.status(400).json({ error: 'Пароли не совпадают' });
+  }
+
+  db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hashPassword(password), req.user.id);
+  // Пароль меняется без запроса старого; отзываем остальные активные сессии.
+  // Текущая сессия остаётся действительной на этом устройстве.
+  db.prepare('DELETE FROM sessions WHERE user_id = ? AND token != ?').run(req.user.id, req.cookies?.sid || '');
+  db.prepare('DELETE FROM login_attempts WHERE login_key = ?').run(normalizeLogin(req.user.login));
+  res.json({ ok: true });
+});
+
 authRouter.post('/logout', (req, res) => {
   destroySession(req, res);
   res.json({ ok: true });

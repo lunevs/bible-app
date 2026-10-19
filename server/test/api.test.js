@@ -77,6 +77,37 @@ test('повторный логин с верным/неверным парол�
   assert.equal(ok.status, 200);
 });
 
+test('смена своего пароля без старого пароля и с подтверждением', async () => {
+  const c = makeClient();
+  await c('POST', '/api/auth/register', { login: 'test_change_password', password: 'oldpass' });
+
+  const mismatch = await c('POST', '/api/auth/change-password', {
+    password: 'newpass',
+    passwordRepeat: 'different',
+  });
+  assert.equal(mismatch.status, 400);
+
+  const tooShort = await c('POST', '/api/auth/change-password', {
+    password: '12',
+    passwordRepeat: '12',
+  });
+  assert.equal(tooShort.status, 400);
+
+  const changed = await c('POST', '/api/auth/change-password', {
+    password: 'newpass',
+    passwordRepeat: 'newpass',
+  });
+  assert.equal(changed.status, 200);
+
+  const me = await c('GET', '/api/auth/me');
+  assert.equal(me.data.user.login, 'test_change_password');
+
+  const oldLogin = makeClient();
+  assert.equal((await oldLogin('POST', '/api/auth/login', { login: 'test_change_password', password: 'oldpass' })).status, 401);
+  const newLogin = makeClient();
+  assert.equal((await newLogin('POST', '/api/auth/login', { login: 'test_change_password', password: 'newpass' })).status, 200);
+});
+
 test('блокировка после 5 неудачных попыток', async () => {
   const c = makeClient();
   await c('POST', '/api/auth/register', { login: 'test_lockme', password: 'pass' });
