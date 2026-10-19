@@ -28,7 +28,7 @@ export default function OpenNotesPage() {
   if (!notes) return <div className="container py-4 text-muted">Загрузка…</div>;
 
   return (
-    <div className="container py-3">
+    <div className="container py-3 open-notes-page">
       <h1 className="h5 mb-1">Открытые заметки группы</h1>
       <p className="text-muted small">
         Это заметки, которые авторы сделали видимыми всем. Личные заметки здесь не показываются.

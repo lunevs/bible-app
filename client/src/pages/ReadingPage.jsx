@@ -100,6 +100,15 @@ function Reader({ entry, status, setStatus, onChanged }) {
   }, [toast]);
 
   const myNotes = entry.myNotes || {};
+  const verseGroups = entry.verses.reduce((groups, verse) => {
+    const last = groups[groups.length - 1];
+    if (last && last.book === verse.book && last.chapter === verse.chapter) {
+      last.verses.push(verse);
+    } else {
+      groups.push({ book: verse.book, chapter: verse.chapter, verses: [verse] });
+    }
+    return groups;
+  }, []);
 
   const handleCopy = async (verse) => {
     const ok = await copyText(verse.text);
@@ -147,52 +156,57 @@ function Reader({ entry, status, setStatus, onChanged }) {
         Нажмите на стих, чтобы добавить заметку.
       </p>
 
-      <div className="card-soft p-2 mb-4">
-        {entry.verses.map((v) => {
-          const isMain =
-            entry.mainVerse &&
-            v.book === entry.mainVerse.book &&
-            v.chapter === entry.mainVerse.chapter &&
-            v.verse === entry.mainVerse.verse;
-          const isLast = v === entry.verses[entry.verses.length - 1];
-          const mine = myNotes[`${v.book}:${v.chapter}:${v.verse}`];
-          return (
-            <div
-              key={`${v.book}-${v.chapter}-${v.verse}`}
-              className={`verse verse-tap ${isMain ? 'main-verse' : ''}`}
-              ref={isLast ? lastVerseRef : null}
-              role="button"
-              tabIndex={0}
-              onClick={() => setActionVerse(v)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setActionVerse(v);
-                }
-              }}
-            >
-              <span className="vnum">{v.verse}</span>
-              <span className="verse-text">
-                {isMain && <span className="main-verse-tag">Главный стих</span>}
-                {v.text}
-              </span>
-              {mine && (
-                <button
-                  type="button"
-                  className="note-flag"
-                  title={`Мои заметки к стиху (${mine.count})`}
-                  aria-label="Мои заметки к стиху"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setViewVerse(v);
+      <div className="verse-groups mb-4">
+        {verseGroups.map((group) => (
+          <section className="chapter-card" key={`${group.book}-${group.chapter}`}>
+            <h2 className="chapter-heading">{BOOK_NAMES[group.book] || group.book} · Глава {group.chapter}</h2>
+            {group.verses.map((v) => {
+              const isMain =
+                entry.mainVerse &&
+                v.book === entry.mainVerse.book &&
+                v.chapter === entry.mainVerse.chapter &&
+                v.verse === entry.mainVerse.verse;
+              const isLast = v === entry.verses[entry.verses.length - 1];
+              const mine = myNotes[`${v.book}:${v.chapter}:${v.verse}`];
+              return (
+                <div
+                  key={`${v.book}-${v.chapter}-${v.verse}`}
+                  className={`verse verse-tap ${isMain ? 'main-verse' : ''}`}
+                  ref={isLast ? lastVerseRef : null}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActionVerse(v)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActionVerse(v);
+                    }
                   }}
                 >
-                  <img src="/note-icon.png" alt="заметка" />
-                </button>
-              )}
-            </div>
-          );
-        })}
+                  <span className="vnum">{v.verse}</span>
+                  <span className="verse-text">
+                    {isMain && <span className="main-verse-tag">Главный стих</span>}
+                    {v.text}
+                  </span>
+                  {mine && (
+                    <button
+                      type="button"
+                      className="note-flag"
+                      title={`Мои заметки к стиху (${mine.count})`}
+                      aria-label="Мои заметки к стиху"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setViewVerse(v);
+                      }}
+                    >
+                      <img src="/note-icon.png" alt="заметка" />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </section>
+        ))}
       </div>
 
       {actionVerse && (

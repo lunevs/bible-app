@@ -526,7 +526,12 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 .reading-timer { min-width: 46px; text-align: right; color: var(--brand); font-variant-numeric: tabular-nums; font-weight: 700; }
 .reading-page > .progress { height: 5px !important; border-radius: 99px; background: #e3e7e0; }
 .reading-page .progress-bar { background: var(--brand) !important; border-radius: inherit; transition: width 0.3s ease; }
-.reading-page > .card-soft { padding: 10px !important; background: #fffefa; }
+.verse-groups { display: grid; gap: 14px; }
+.chapter-card { padding: 8px; border: 1px solid var(--line); border-radius: 16px; background: #eeefe8; }
+.chapter-heading { margin: 0 2px 6px; padding: 5px 7px; color: var(--muted); font-family: system-ui, sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.chapter-card .verse { background: var(--surface); }
+.chapter-card .verse + .verse { border-top: 1px solid #f0efe8; }
+.chapter-card .verse.main-verse { background: #f7f0df; }
 .verse {
   gap: 9px;
   padding: 11px 10px;
@@ -562,6 +567,7 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 .text-late { color: var(--late); }
 
 .note-card { border-radius: 14px; padding: 14px; }
+.open-notes-page .note-card.note-open { padding-bottom: 6px; }
 .note-personal { background: #f4f7f4; border-left-color: var(--brand); }
 .note-open { border-left-color: #67896d; }
 .note-text { line-height: 1.6; overflow-wrap: anywhere; }
