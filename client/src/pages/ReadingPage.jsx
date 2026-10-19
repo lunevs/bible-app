@@ -67,7 +67,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
   const [toast, setToast] = useState('');
 
   const timerDuration = entry.verses.length * 2;
-  const { remainingSeconds, markReachedEnd } = useReadingTracker({
+  const { remainingSeconds, credited, markReachedEnd } = useReadingTracker({
     planId: entry.planId,
     date: entry.date,
     enabled: entry.status !== 'green' && entry.status !== 'blue',
@@ -76,8 +76,6 @@ function Reader({ entry, status, setStatus, onChanged }) {
     onStatus: setStatus,
   });
 
-  const readStatus = status === 'green' || status === 'blue';
-  const credited = readStatus && remainingSeconds === 0;
   const progressPct = Math.min(100, Math.round(((timerDuration - remainingSeconds) / timerDuration) * 100));
 
   // Отслеживание «дошёл до конца отрывка».

@@ -21,6 +21,7 @@ export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, t
   const visibleRef = useRef(document.visibilityState === 'visible');
   const enabledRef = useRef(enabled);
   const socketBusyRef = useRef(false);
+  const sendPendingRef = useRef(false);
 
   const IDLE_MS = 30000;
   const SEND_MS = 12000;
@@ -31,20 +32,25 @@ export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, t
     lastActivityRef.current = Date.now();
   }, []);
 
-  const send = useCallback(async ({ beacon = false } = {}) => {
-    if (!enabledRef.current || socketBusyRef.current) return;
+  const send = useCallback(async () => {
+    if (!enabledRef.current) return;
+    if (socketBusyRef.current) {
+      sendPendingRef.current = true;
+      return;
+    }
     const delta = Math.floor(unsentRef.current);
     if (delta <= 0 && !reachedEndRef.current) return;
     socketBusyRef.current = true;
     unsentRef.current -= delta;
+    const reachedEnd = reachedEndRef.current;
     try {
       const res = await api.post('/reading/progress', {
         planId,
         date,
         seconds: delta,
-        reachedEnd: reachedEndRef.current,
+        reachedEnd,
       });
-      if (res.status === 'green' || res.status === 'blue') creditedRef.current = true;
+      if (res.progress.readAt != null) creditedRef.current = true;
       setStatus(res.status);
       onStatus?.(res.status);
     } catch {
@@ -52,6 +58,10 @@ export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, t
       unsentRef.current += delta;
     } finally {
       socketBusyRef.current = false;
+      if (sendPendingRef.current) {
+        sendPendingRef.current = false;
+        queueMicrotask(() => send());
+      }
     }
   }, [planId, date, onStatus]);
 
@@ -66,10 +76,11 @@ export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, t
         setSeconds(secondsRef.current);
         remainingRef.current -= 1;
         setRemainingSeconds(remainingRef.current);
+        if (remainingRef.current === 0) send();
       }
     }, 1000);
     return () => clearInterval(tick);
-  }, []);
+  }, [send]);
 
   // Слушатели активности и видимости.
   useEffect(() => {
@@ -108,5 +119,5 @@ export function useReadingTracker({ planId, date, enabled, initialSeconds = 0, t
     send();
   }, [send]);
 
-  return { seconds, remainingSeconds, status, reachedEnd, markReachedEnd, refs: { secondsRef } };
+  return { seconds, remainingSeconds, status, credited: creditedRef.current, reachedEnd, markReachedEnd, refs: { secondsRef } };
 }
