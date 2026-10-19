@@ -35,14 +35,10 @@ export default function ProgressPage() {
 
   return (
     <div className="container py-3">
-      <div className="home-heading mb-3">
-        <div className="home-greeting">План чтения</div>
-        <h1 className="h5 mb-0">{user.login}. План чтения: {data?.planName || '…'}</h1>
-      </div>
       {data && (
         <div className="card-soft progress-summary p-3 mb-3">
           <div className="progress-summary-heading">
-            <span className="text-muted small">План «{data.planName}»</span>
+            <span className="text-muted small">План чтения: {data.planName}</span>
             <strong>{(counts.green || 0) + (counts.blue || 0)} из {all.length} прочитано</strong>
           </div>
           <div className="progress summary-progress" role="img" aria-label={`${(counts.green || 0) + (counts.blue || 0)} из ${all.length} отрывков прочитано`}>
