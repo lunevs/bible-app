@@ -165,15 +165,22 @@ notesRouter.post('/notes/:id/like', requireAuth, (req, res) => {
 });
 
 // Все открытые заметки (лента группы) — опционально, для просмотра.
-notesRouter.get('/notes/open', requireAuth, (_req, res) => {
+notesRouter.get('/notes/open', requireAuth, (req, res) => {
   const rows = db
     .prepare(
       `SELECT n.*, u.login AS author_login,
-              (SELECT COUNT(*) FROM likes l WHERE l.note_id = n.id) AS likes
+              (SELECT COUNT(*) FROM likes l WHERE l.note_id = n.id) AS likes,
+              EXISTS(SELECT 1 FROM likes mine WHERE mine.note_id = n.id AND mine.user_id = ?) AS liked_by_me
        FROM notes n JOIN users u ON u.id = n.user_id
        WHERE n.visibility = 'open'
        ORDER BY n.updated_at DESC LIMIT 200`
     )
-    .all();
-  res.json({ notes: rows });
+    .all(req.user.id);
+  res.json({
+    notes: rows.map(({ liked_by_me, ...n }) => ({
+      ...n,
+      likedByMe: Boolean(liked_by_me),
+      isMine: n.user_id === req.user.id,
+    })),
+  });
 });

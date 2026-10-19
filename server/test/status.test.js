@@ -70,10 +70,16 @@ test('красный крестик после позднего чтения с�
   assert.notEqual(after, 'green');
 });
 
-test('баллы: зелёная 1, синяя 0,5, остальные 0', () => {
-  assert.equal(statusPoints('green'), 1);
-  assert.equal(statusPoints('blue'), 0.5);
+test('баллы за чтение: вовремя 5, позже 4, остальные статусы 0', () => {
+  assert.equal(statusPoints('green'), 5);
+  assert.equal(statusPoints('blue'), 4);
   assert.equal(statusPoints('missed'), 0);
   assert.equal(statusPoints('neutral'), 0);
   assert.equal(statusPoints('empty'), 0);
+});
+
+test('баллы всегда целые числа', () => {
+  for (const status of ['green', 'blue', 'missed', 'neutral', 'empty']) {
+    assert.equal(Number.isInteger(statusPoints(status)), true);
+  }
 });

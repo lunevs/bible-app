@@ -13,10 +13,17 @@ export default function LeaderboardPage() {
   return (
     <div className="container py-3">
       <h1 className="h5 mb-3">Доска лидеров</h1>
-      <p className="text-muted small">
-        Чтение: зелёная галочка — 1 балл, синяя — 0,5. Лайк на вашу заметку — +0,1 балла.
-        Видна всем участникам.
-      </p>
+      <div className="leaderboard-rules">
+        <span>Чтение в срок — <strong>5 баллов</strong></span>
+        <span>С опозданием — <strong>4 балла</strong></span>
+        <span>Каждый полученный лайк — <strong>1 балл</strong></span>
+      </div>
+
+      <div className="leaderboard-columns" aria-hidden="true">
+        <span />
+        <span>Участник</span>
+        <span>Баллы</span>
+      </div>
 
       {rows.map((r, i) => (
         <div key={r.id} className="leader-row">
@@ -25,16 +32,13 @@ export default function LeaderboardPage() {
             <div className="fw-semibold">
               {r.login} {r.role === 'admin' && <span className="badge text-bg-secondary ms-1">админ</span>}
             </div>
-            <div className="text-muted small">
-              🟢 {r.green} · 🔵 {r.blue} из {r.total} · ♥ {r.likes}
+            <div className="leader-details">
+              <span><i className="leader-dot on-time" aria-hidden="true" />В срок {r.green}</span>
+              <span><i className="leader-dot late" aria-hidden="true" />Позже {r.blue}</span>
+              <span>♥ {r.likes}</span>
             </div>
-            {(r.likePoints > 0 || r.readingPoints > 0) && (
-              <div className="text-muted small">
-                чтение {r.readingPoints} + лайки {r.likePoints}
-              </div>
-            )}
           </div>
-          <div className="leader-points">{r.points} б.</div>
+          <div className="leader-points">{r.points}</div>
         </div>
       ))}
 

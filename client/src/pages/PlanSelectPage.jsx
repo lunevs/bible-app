@@ -51,19 +51,22 @@ export default function PlanSelectPage() {
       {plans.map((p) => {
         const active = user.planId === p.id;
         return (
-          <div key={p.id} className={`card-soft p-3 mb-3 ${active ? 'border-primary' : ''}`}>
-            <div className="h6 mb-0">
+          <button
+            type="button"
+            key={p.id}
+            className={`plan-card card-soft p-3 mb-3 text-start w-100 ${active ? 'selected' : ''}`}
+            disabled={active}
+            onClick={() => select(p.id)}
+          >
+            <div className="d-flex justify-content-between align-items-center gap-2">
+              <div className="h6 mb-0">
               {p.name} {active && <span className="badge text-bg-primary ms-1">выбран</span>}
+              </div>
+              <span className="plan-card-arrow" aria-hidden="true">{active ? '✓' : '→'}</span>
             </div>
             <div className="text-muted small">{p.description}</div>
-            <button
-              className={`btn mt-3 w-100 ${active ? 'btn-outline-secondary' : 'btn-brand'}`}
-              disabled={active}
-              onClick={() => select(p.id)}
-            >
-              {active ? 'Текущий план' : user.planId ? 'Перейти на этот план' : 'Выбрать'}
-            </button>
-          </div>
+            <div className="plan-card-action">{active ? 'Текущий план' : user.planId ? 'Перейти на этот план' : 'Выбрать план'}</div>
+          </button>
         );
       })}
     </div>

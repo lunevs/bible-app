@@ -57,8 +57,11 @@ function PlanHome() {
 
   return (
     <div className="container py-3">
-      <div className="fw-semibold mb-3">
+      <div className="home-heading mb-3">
+        <div className="home-greeting">План чтения</div>
+        <div className="fw-semibold">
         {user.login}. План чтения: {data.planName}
+        </div>
       </div>
 
       {!data.today && (
@@ -85,6 +88,7 @@ function PlanHome() {
             </div>
             <StatusBadge status={data.today.status} size={26} />
           </div>
+          <div className="reading-card-action">Открыть чтение <span aria-hidden="true">→</span></div>
         </div>
       )}
 
@@ -108,16 +112,8 @@ function PlanHome() {
             <div className="h5 mb-0">{data.nextUnread.label}</div>
             <StatusBadge status={data.nextUnread.status} size={24} />
           </div>
+          <div className="reading-card-action">Перейти к отрывку <span aria-hidden="true">→</span></div>
         </div>
-      )}
-
-      {data.missedDays?.length > 0 && (
-        <>
-          <div className="text-muted small mt-3 mb-2">пропущенные отрывки</div>
-          {data.missedDays.map((d) => (
-            <Row key={d.date} d={d} />
-          ))}
-        </>
       )}
 
       {data.readDays?.length > 0 && (

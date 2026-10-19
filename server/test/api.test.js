@@ -208,6 +208,32 @@ test('нельзя лайкать свою заметку', async () => {
   assert.equal(r.status, 400);
 });
 
+test('лента заметок сообщает, поставил ли пользователь лайк и своя ли заметка', async () => {
+  const author = makeClient();
+  const reader = makeClient();
+  await author('POST', '/api/auth/register', { login: 'test_feed_author', password: '123' });
+  await reader('POST', '/api/auth/register', { login: 'test_feed_reader', password: '123' });
+  const created = await author('POST', '/api/notes', { book: 'Мк', chapter: 1, verse: 16, text: 'Открытая мысль', visibility: 'open' });
+
+  const before = await reader('GET', '/api/notes/open');
+  const note = before.data.notes.find((item) => item.id === created.data.id);
+  assert.ok(note);
+  assert.equal(note.likedByMe, false);
+  assert.equal(note.isMine, false);
+
+  const id = note.id;
+  await reader('POST', `/api/notes/${id}/like`);
+  const after = await reader('GET', '/api/notes/open');
+  const likedNote = after.data.notes.find((item) => item.id === id);
+  assert.equal(likedNote.likedByMe, true);
+  assert.equal(likedNote.likes, 1);
+
+  const own = await author('GET', '/api/notes/open');
+  const ownNote = own.data.notes.find((item) => item.id === id);
+  assert.equal(ownNote.isMine, true);
+  assert.equal(ownNote.likedByMe, false);
+});
+
 // --- Лидерборд ---
 
 test('доска лидеров: баллы и сортировка', async () => {
@@ -217,7 +243,7 @@ test('доска лидеров: баллы и сортировка', async () =
   await c('POST', '/api/reading/progress', { planId: 'lite', date: '2026-10-19', seconds: 60, reachedEnd: true });
   const { data } = await c('GET', '/api/leaderboard');
   const me = data.leaderboard.find((u) => u.login === 'test_lead');
-  assert.equal(me.points, 1);
+  assert.equal(me.points, 5);
   assert.equal(me.green, 1);
   // сортировка по убыванию баллов
   for (let i = 1; i < data.leaderboard.length; i++) {
@@ -225,12 +251,12 @@ test('доска лидеров: баллы и сортировка', async () =
   }
 });
 
-test('лайк на заметку добавляет автору 0,1 балла', async () => {
+test('лайк добавляет 1 балл к 5 баллам за своевременное чтение', async () => {
   const author = makeClient();
   const fan = makeClient();
   await author('POST', '/api/auth/register', { login: 'test_liked_author', password: '123' });
   await author('POST', '/api/auth/plan', { planId: 'lite' });
-  // автор читает день вовремя → 1 балл
+  // автор читает день вовремя → 5 баллов
   await author('POST', '/api/reading/progress', { planId: 'lite', date: '2026-10-19', seconds: 60, reachedEnd: true });
   // открытая заметка автора
   await author('POST', '/api/notes', { book: 'Мк', chapter: 1, verse: 8, text: 'мысль', visibility: 'open' });
@@ -243,9 +269,9 @@ test('лайк на заметку добавляет автору 0,1 балл�
   const { data } = await fan('GET', '/api/leaderboard');
   const me = data.leaderboard.find((u) => u.login === 'test_liked_author');
   assert.equal(me.likes, 1);
-  assert.equal(me.likePoints, 0.1);
-  assert.equal(me.readingPoints, 1);
-  assert.equal(me.points, 1.1);
+  assert.equal(me.likePoints, 1);
+  assert.equal(me.readingPoints, 5);
+  assert.equal(me.points, 6);
 });
 
 test('снятие лайка убирает балл', async () => {

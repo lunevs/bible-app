@@ -11,6 +11,8 @@ export function StatusBadge({ status, size = 22 }) {
     <span
       className={`status-dot ${s.cls}`}
       title={s.title}
+      role="img"
+      aria-label={s.title}
       style={{ width: size, height: size }}
     >
       {s.sym}
@@ -22,10 +24,10 @@ export function Legend() {
   return (
     <div className="card-soft p-3 mb-3">
       <div className="legend-item">
-        <StatusBadge status="green" /> прочитано вовремя (1 балл)
+        <StatusBadge status="green" /> прочитано вовремя
       </div>
       <div className="legend-item">
-        <StatusBadge status="blue" /> прочитано позже (0,5 балла)
+        <StatusBadge status="blue" /> прочитано позже
       </div>
       <div className="legend-item">
         <StatusBadge status="missed" /> пропущено (0 баллов)

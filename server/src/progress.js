@@ -41,10 +41,8 @@ export function userDays(user, planId = user.plan_id, nowTs = Date.now()) {
   });
 }
 
-// Баллы за лайки, полученные на заметки пользователя (0,1 за каждый лайк).
-export const LIKE_POINTS = 0.1;
-
-const round1 = (x) => Math.round(x * 10) / 10;
+// Один балл за каждый лайк, полученный на заметки пользователя.
+export const LIKE_POINTS = 1;
 
 // Сколько лайков всего получили заметки пользователя.
 export function likesReceived(userId) {
@@ -69,10 +67,10 @@ export function userSummary(user, planId = user.plan_id, nowTs = Date.now()) {
     else if (d.status === 'missed') missed++;
   }
   const likes = likesReceived(user.id);
-  const likePoints = round1(likes * LIKE_POINTS);
+  const likePoints = likes * LIKE_POINTS;
   return {
-    points: round1(readingPoints + likePoints),
-    readingPoints: round1(readingPoints),
+    points: readingPoints + likePoints,
+    readingPoints,
     likes,
     likePoints,
     green,

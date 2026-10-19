@@ -13,26 +13,41 @@ import OpenNotesPage from './pages/OpenNotesPage.jsx';
 function BottomNav() {
   const { user } = useAuth();
   if (!user) return null;
+
+  const icons = {
+    read: <><path d="M12 7v14" /><path d="M3 18V5a1 1 0 0 1 1-1h4a4 4 0 0 1 4 4 4 4 0 0 1 4-4h4a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-4a4 4 0 0 0-4 2 4 4 0 0 0-4-2H4a1 1 0 0 1-1-1Z" /></>,
+    progress: <><path d="M4 19V5" /><path d="M4 19h17" /><path d="m7 15 4-4 3 2 5-6" /></>,
+    notes: <><path d="M8 6h13" /><path d="M8 12h13" /><path d="M8 18h13" /><path d="M3 6h.01" /><path d="M3 12h.01" /><path d="M3 18h.01" /></>,
+    leaderboard: <><path d="M8 21h8" /><path d="M12 17v4" /><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" /><path d="M7 7H4v2a4 4 0 0 0 4 4" /><path d="M17 7h3v2a4 4 0 0 1-4 4" /></>,
+    more: <><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>,
+  };
+
+  const Icon = ({ name }) => (
+    <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {icons[name]}
+    </svg>
+  );
+
   return (
-    <nav className="bottom-nav">
+    <nav className="bottom-nav" aria-label="Основная навигация">
       <NavLink to="/" end>
-        <span className="icon">📖</span>
+        <Icon name="read" />
         Чтение
       </NavLink>
       <NavLink to="/progress">
-        <span className="icon">📊</span>
+        <Icon name="progress" />
         Прогресс
       </NavLink>
       <NavLink to="/notes">
-        <span className="icon">📝</span>
+        <Icon name="notes" />
         Заметки
       </NavLink>
       <NavLink to="/leaderboard">
-        <span className="icon">🏆</span>
+        <Icon name="leaderboard" />
         Рейтинг
       </NavLink>
       <NavLink to="/settings">
-        <span className="icon">⚙️</span>
+        <Icon name="more" />
         Ещё
       </NavLink>
     </nav>

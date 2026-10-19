@@ -5,6 +5,7 @@ import { formatDate } from '../dates.js';
 import { StatusBadge } from '../components/StatusBadge.jsx';
 import { useReadingTracker } from '../hooks/useReadingTracker.js';
 import { copyText } from '../clipboard.js';
+import CollapsibleNoteText from '../components/CollapsibleNoteText.jsx';
 
 const BOOK_NAMES = {
   Мф: 'Евангелие от Матфея',
@@ -104,7 +105,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
   };
 
   return (
-    <div className="container py-3">
+    <div className="container py-3 reading-page">
       <div className="d-flex justify-content-between align-items-start mb-2">
         <button className="btn btn-sm btn-outline-secondary" onClick={() => navigate(-1)}>
           ← Назад
@@ -113,12 +114,12 @@ function Reader({ entry, status, setStatus, onChanged }) {
       </div>
 
       <div className="text-muted small">{formatDate(entry.date)}</div>
-      <h1 className="h5 mt-1">{entry.label}</h1>
+      <h1 className="reading-title mt-1">{entry.label}</h1>
       {entry.special === 'christmas' && (
         <span className="badge text-bg-warning mb-2">Рождественский отрывок</span>
       )}
 
-      <div className="reader-progress d-flex justify-content-between align-items-center">
+      <div className="reader-progress d-flex justify-content-between align-items-center" aria-live="polite">
         <span>
           {credited
             ? 'Отрывок прочитан'
@@ -126,11 +127,10 @@ function Reader({ entry, status, setStatus, onChanged }) {
               ? 'Дошли до конца. Ещё немного активного чтения — и зачтётся.'
               : 'Читайте: время накапливается, пока экран активен.'}
         </span>
-        <span>{sessionSeconds} c</span>
+        <span className="reading-timer" aria-label={`Время чтения в этой сессии: ${sessionSeconds} секунд`}>{sessionSeconds} с</span>
       </div>
       <div className="progress mb-3" style={{ height: 6 }}>
-        <div
-          className="progress-bar"
+        <div className="progress-bar"
           style={{ width: `${progressPct}%`, background: 'var(--brand)' }}
         />
       </div>
@@ -171,7 +171,10 @@ function Reader({ entry, status, setStatus, onChanged }) {
               }}
             >
               <span className="vnum">{v.verse}</span>
-              <span className="verse-text">{v.text}</span>
+              <span className="verse-text">
+                {isMain && <span className="main-verse-tag">Главный стих</span>}
+                {v.text}
+              </span>
               {mine && (
                 <button
                   type="button"
@@ -445,7 +448,7 @@ function ViewNotesModal({ verse, onClose, onChanged }) {
                   </button>
                 </div>
               </div>
-              <div className="mt-1 note-text">{n.text}</div>
+              <CollapsibleNoteText text={n.text} className="mt-1" />
               {n.likes > 0 && <div className="text-muted small mt-1">♥ {n.likes}</div>}
             </>
           )}
@@ -455,7 +458,7 @@ function ViewNotesModal({ verse, onClose, onChanged }) {
       {open.map((n) => (
         <div key={n.id} className="note-card note-open mb-2">
           <div className="text-muted small">{n.authorLogin}</div>
-          <div className="mt-1 note-text">{n.text}</div>
+          <CollapsibleNoteText text={n.text} className="mt-1" />
           <button className={`like-btn ${n.likedByMe ? 'liked' : ''}`} onClick={() => like(n)}>
             ♥ {n.likes}
           </button>

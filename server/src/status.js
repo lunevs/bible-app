@@ -58,10 +58,10 @@ export function computeStatus({ date, readAt, participationDate, now = Date.now(
   return 'neutral';
 }
 
-// Баллы за статус (раздел 8): зелёная 1, синяя 0.5, остальное 0.
+// Баллы за статус: чтение вовремя — 5, с опозданием — 4, иначе 0.
 export function statusPoints(status) {
-  if (status === 'green') return 1;
-  if (status === 'blue') return 0.5;
+  if (status === 'green') return 5;
+  if (status === 'blue') return 4;
   return 0;
 }
 

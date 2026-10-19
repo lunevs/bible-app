@@ -37,32 +37,27 @@ export default function ProgressPage() {
   return (
     <div className="container py-3">
       <h1 className="h5 mb-3">Прогресс</h1>
-      <Legend />
-
       {data && (
-        <div className="card-soft p-3 mb-3">
-          <div className="d-flex justify-content-around text-center">
-            <div>
-              <div className="h5 mb-0 text-success">{counts.green || 0}</div>
-              <div className="text-muted small">вовремя</div>
-            </div>
-            <div>
-              <div className="h5 mb-0" style={{ color: 'var(--late)' }}>
-                {counts.blue || 0}
-              </div>
-              <div className="text-muted small">позже</div>
-            </div>
-            <div>
-              <div className="h5 mb-0 text-danger">{counts.missed || 0}</div>
-              <div className="text-muted small">пропущено</div>
-            </div>
-            <div>
-              <div className="h5 mb-0">{data.planName}</div>
-              <div className="text-muted small">план</div>
-            </div>
+        <div className="card-soft progress-summary p-3 mb-3">
+          <div className="progress-summary-heading">
+            <span className="text-muted small">План «{data.planName}»</span>
+            <strong>{(counts.green || 0) + (counts.blue || 0)} из {all.length} прочитано</strong>
+          </div>
+          <div className="progress summary-progress" role="img" aria-label={`${(counts.green || 0) + (counts.blue || 0)} из ${all.length} отрывков прочитано`}>
+            <div className="progress-bar" style={{ width: `${all.length ? Math.round((((counts.green || 0) + (counts.blue || 0)) / all.length) * 100) : 0}%` }} />
+          </div>
+          <div className="progress-stats">
+            <div><strong className="text-success">{counts.green || 0}</strong><span>вовремя</span></div>
+            <div><strong className="text-late">{counts.blue || 0}</strong><span>позже</span></div>
+            <div><strong className="text-danger">{counts.missed || 0}</strong><span>пропущено</span></div>
           </div>
         </div>
       )}
+
+      <details className="status-legend mb-3">
+        <summary>Что означают отметки?</summary>
+        <Legend />
+      </details>
 
       {all.map((d) => (
         <button
@@ -75,7 +70,7 @@ export default function ProgressPage() {
             <div className="label">{d.label}</div>
             <div className="date">{formatDate(d.date)}</div>
           </div>
-          {d.points > 0 && <span className="ms-auto text-muted small">{d.points} б.</span>}
+          {d.points > 0 && <span className="ms-auto text-muted small">{d.points}</span>}
         </button>
       ))}
     </div>

@@ -3,6 +3,13 @@ import { api } from '../api.js';
 import { StatusBadge } from '../components/StatusBadge.jsx';
 import { formatDate, formatTime } from '../dates.js';
 
+function pointsLabel(points) {
+  const lastTwo = points % 100;
+  const last = points % 10;
+  const word = lastTwo >= 11 && lastTwo <= 14 ? 'баллов' : last === 1 ? 'балл' : last >= 2 && last <= 4 ? 'балла' : 'баллов';
+  return `${points} ${word}`;
+}
+
 export default function AdminPage() {
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState('');
@@ -40,7 +47,7 @@ export default function AdminPage() {
       {message && <div className="alert alert-info py-2">{message}</div>}
 
       {users.map((u) => (
-        <div key={u.id} className="card-soft p-3 mb-2">
+        <div key={u.id} className="card-soft admin-user-card p-3 mb-2">
           <div className="d-flex justify-content-between align-items-center">
             <div>
               <div className="fw-semibold">
@@ -48,10 +55,10 @@ export default function AdminPage() {
               </div>
               <div className="text-muted small">
                 {u.planId ? `план: ${u.planId}` : 'план не выбран'}
-                {u.planId ? ` · ${u.summary.points} б. (🟢${u.summary.green}/🔵${u.summary.blue})` : ''}
+                {u.planId ? ` · ${pointsLabel(u.summary.points)}` : ''}
               </div>
             </div>
-            <div className="d-flex gap-1">
+            <div className="d-flex gap-1 admin-user-actions">
               <button className="btn btn-sm btn-outline-secondary" onClick={() => viewProgress(u)}>
                 Прогресс
               </button>
