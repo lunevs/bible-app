@@ -221,7 +221,7 @@ export default function QuestionsPage() {
                 </>
               )}
               <div className="answer-compose">
-                <textarea className="form-control" rows={2} maxLength={2000} placeholder="Поделитесь своей мыслью…" value={answerDrafts[question.id] || ''} onChange={(e) => setAnswerDrafts((current) => ({ ...current, [question.id]: e.target.value }))} />
+                <textarea className="form-control" rows={4} maxLength={2000} aria-label="Ответ на вопрос" placeholder="Поделитесь своей мыслью…" value={answerDrafts[question.id] || ''} onChange={(e) => setAnswerDrafts((current) => ({ ...current, [question.id]: e.target.value }))} />
                 <button type="button" className="btn btn-sm btn-brand" disabled={!answerDrafts[question.id]?.trim()} onClick={() => submitAnswer(question)}>Ответить</button>
               </div>
             </div>

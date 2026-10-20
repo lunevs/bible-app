@@ -3,13 +3,15 @@
 // Работают на ОТДЕЛЬНОЙ временной базе (os.tmpdir) и случайном порту —
 // продовую базу не трогают. Все тестовые пользователи имеют префикс `test_`,
 // а файл временной БД удаляется в хуке after().
-import test, { after } from 'node:test';
+import test, { after, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
 const dbPath = path.join(os.tmpdir(), `bible-test-${Date.now()}-${process.pid}.db`);
+// Календарные сценарии должны давать одинаковый результат в любой день запуска.
+mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-19T10:00:00Z') });
 process.env.DB_PATH = dbPath;
 process.env.PORT = '0';
 process.env.SESSION_SECRET = 'test-secret';
@@ -377,6 +379,23 @@ test('участник не может удалять чужой вопрос и
 });
 
 // --- Лидерборд ---
+
+test('доска лидеров доступна только с активной сессией', async () => {
+  const c = makeClient();
+  const anonymous = await c('GET', '/api/leaderboard');
+  assert.equal(anonymous.status, 401);
+  assert.deepEqual(anonymous.data, { error: 'Требуется вход' });
+
+  await c('POST', '/api/auth/register', { login: 'test_leaderboard_auth', password: '123' });
+  const authenticated = await c('GET', '/api/leaderboard');
+  assert.equal(authenticated.status, 200);
+  assert.ok(Array.isArray(authenticated.data.leaderboard));
+
+  await c('POST', '/api/auth/logout');
+  const loggedOut = await c('GET', '/api/leaderboard');
+  assert.equal(loggedOut.status, 401);
+  assert.deepEqual(loggedOut.data, { error: 'Требуется вход' });
+});
 
 test('доска лидеров: баллы и сортировка', async () => {
   const c = makeClient();

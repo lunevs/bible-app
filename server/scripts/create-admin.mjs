@@ -1,7 +1,6 @@
 // Создание пользователя-администратора из командной строки.
 // Использование: node scripts/create-admin.mjs <логин> <пароль>
-import { db, now } from '../src/db.js';
-import { hashPassword, normalizeLogin } from '../src/auth.js';
+import { createAdmin } from '../src/bootstrap-admin.js';
 
 const [, , login, password] = process.argv;
 if (!login || !password) {
@@ -9,18 +8,12 @@ if (!login || !password) {
   process.exit(1);
 }
 
-const loginKey = normalizeLogin(login);
-const existing = db.prepare('SELECT id FROM users WHERE login_key = ?').get(loginKey);
-if (existing) {
-  db.prepare('UPDATE users SET role = ?, password_hash = ? WHERE id = ?').run(
-    'admin',
-    hashPassword(password),
-    existing.id
-  );
-  console.log(`Пользователь "${login.trim()}" обновлён: роль admin, пароль задан.`);
-} else {
-  db.prepare(
-    'INSERT INTO users (login, login_key, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)'
-  ).run(login.trim(), loginKey, hashPassword(password), 'admin', now());
-  console.log(`Администратор "${login.trim()}" создан.`);
+try {
+  const created = createAdmin(login, password);
+  console.log(created
+    ? `Администратор "${login.trim()}" создан.`
+    : 'Администратор уже существует. Пароль и сессии не изменены.');
+} catch (error) {
+  console.error(error.message);
+  process.exitCode = 1;
 }

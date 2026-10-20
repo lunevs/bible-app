@@ -4,11 +4,11 @@ import fs from 'node:fs';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import { config, paths } from './config.js';
-import { db, now } from './db.js';
 import './db.js';
 import { loadBible } from './bible.js';
 import './plans.js';
-import { attachUser, hashPassword, normalizeLogin } from './auth.js';
+import { attachUser } from './auth.js';
+import { createAdmin } from './bootstrap-admin.js';
 import { authRouter } from './routes/auth.js';
 import { readingRouter } from './routes/reading.js';
 import { notesRouter } from './routes/notes.js';
@@ -20,16 +20,9 @@ import { adminRouter } from './routes/admin.js';
 function bootstrapAdmin() {
   const { login, password } = config.bootstrapAdmin;
   if (!login || !password) return;
-  const loginKey = normalizeLogin(login);
-  const existing = db.prepare('SELECT id FROM users WHERE login_key = ?').get(loginKey);
-  if (existing) {
-    db.prepare('UPDATE users SET role = ? WHERE id = ?').run('admin', existing.id);
-    return;
+  if (createAdmin(login, password)) {
+    console.log(`Создан администратор "${login.trim()}"`);
   }
-  db.prepare(
-    'INSERT INTO users (login, login_key, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)'
-  ).run(login.trim(), loginKey, hashPassword(password), 'admin', now());
-  console.log(`Создан администратор "${login.trim()}"`);
 }
 
 const app = express();

@@ -2,10 +2,11 @@
 import express from 'express';
 import { db } from '../db.js';
 import { userSummary } from '../progress.js';
+import { requireAuth } from '../auth.js';
 
 export const leaderboardRouter = express.Router();
 
-leaderboardRouter.get('/leaderboard', (_req, res) => {
+leaderboardRouter.get('/leaderboard', requireAuth, (_req, res) => {
   const users = db.prepare('SELECT * FROM users').all();
   const rows = users.map((u) => {
     const s = userSummary(u);

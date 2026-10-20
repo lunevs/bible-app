@@ -20,3 +20,4 @@ client/public/apple-touch-icon.png
 .DS_Store
 *.log
 .env
+SECURITY_AUDIT.md

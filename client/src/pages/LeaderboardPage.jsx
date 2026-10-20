@@ -28,9 +28,10 @@ export default function LeaderboardPage() {
       {rows.map((r, i) => (
         <div key={r.id} className="leader-row">
           <div className="leader-rank">{i + 1}</div>
-          <div>
-            <div className="fw-semibold">
-              {r.login} {r.role === 'admin' && <span className="badge text-bg-secondary ms-1">админ</span>}
+          <div className="leader-member">
+            <div className="leader-name fw-semibold">
+              <span className="leader-login" title={r.login}>{r.login}</span>
+              {r.role === 'admin' && <span className="leader-admin badge text-bg-secondary">админ</span>}
             </div>
             <div className="leader-details">
               <span><i className="leader-dot on-time" aria-hidden="true" />В срок {r.green}</span>

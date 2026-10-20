@@ -581,7 +581,11 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 .sheet { background: var(--surface); }
 .sheet-item { min-height: 50px; }
 
-.leader-row { min-height: 72px; border: 1px solid var(--line); }
+.leader-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; min-height: 72px; border: 1px solid var(--line); }
+.leader-member { min-width: 0; }
+.leader-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.leader-login { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leader-admin { flex-shrink: 0; }
 .leader-row:first-of-type .leader-rank { color: var(--gold); }
 .leader-points { white-space: nowrap; }
 .leaderboard-rules { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
@@ -615,13 +619,14 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 .question-owner-actions .question-delete { color: #9a5e58; }
 .answers-panel { margin: 2px 0 0 8px; padding: 10px 0 0 12px; border-left: 2px solid #e0e8e1; }
 .answer-item { padding: 9px 0; border-bottom: 1px solid #eeeee8; }
-.answer-body { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-.answer-body p { flex: 1; margin: 5px 0 0; color: #3b4841; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
-.answer-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; }
+.answer-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.answer-body p { min-width: 0; margin: 5px 0 0; color: #3b4841; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.answer-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
 .answer-like { min-width: 48px; }
-.answer-compose { display: flex; align-items: flex-end; gap: 8px; padding-top: 10px; }
-.answer-compose .form-control { min-height: 56px; font-size: 0.88rem; }
-.answer-compose .btn { flex: 0 0 auto; }
+.answer-compose { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding-top: 10px; }
+/* Размер от 16px предотвращает автоприближение поля ввода в iOS Safari. */
+.answer-compose .form-control { min-height: 120px; min-width: 0; padding: 12px; font-size: max(16px, 1rem); line-height: 1.5; resize: vertical; }
+.answer-compose .btn { align-self: flex-end; flex: 0 0 auto; }
 .question-edit-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 7px; }
 .question-edit-actions .btn { min-height: 36px; }
 .empty-questions { padding: 22px 16px; border: 1px dashed #ccd7ce; border-radius: 14px; color: var(--muted); text-align: center; font-size: 0.9rem; }
