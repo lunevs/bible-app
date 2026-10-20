@@ -39,18 +39,22 @@ notesRouter.get('/notes', requireAuth, (req, res) => {
   const book = String(req.query.book || '');
   const chapter = Number(req.query.chapter);
   const verse = Number(req.query.verse);
+  const verseEnd = req.query.verseEnd == null ? verse : Number(req.query.verseEnd);
   const err = validateTarget({ book, chapter, verse });
   if (err) return res.status(400).json({ error: err });
+  if (!Number.isInteger(verseEnd) || verseEnd < verse || validateTarget({ book, chapter, verse: verseEnd })) {
+    return res.status(400).json({ error: 'Некорректный диапазон стихов' });
+  }
 
   const rows = db
     .prepare(
       `SELECT n.*, u.login AS author_login
        FROM notes n JOIN users u ON u.id = n.user_id
-       WHERE n.book = ? AND n.chapter = ? AND n.verse = ?
+       WHERE n.book = ? AND n.chapter = ? AND n.verse BETWEEN ? AND ?
          AND (n.user_id = ? OR n.visibility = 'open')
        ORDER BY n.created_at ASC`
     )
-    .all(book, chapter, verse, req.user.id);
+    .all(book, chapter, verse, verseEnd, req.user.id);
 
   const ids = rows.map((r) => r.id);
   const likeCounts = new Map();
@@ -179,7 +183,7 @@ notesRouter.get('/notes/open', requireAuth, (req, res) => {
   res.json({
     notes: rows.map(({ liked_by_me, ...n }) => ({
       ...n,
-      verseText: getVerse(n.book, n.chapter, n.verse)?.text || '',
+      verseText: getVerse(n.book, n.chapter, n.verse, req.translation)?.text || '',
       likedByMe: Boolean(liked_by_me),
       isMine: n.user_id === req.user.id,
     })),

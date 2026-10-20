@@ -39,7 +39,7 @@ questionsRouter.get('/questions', requireAuth, (req, res) => {
       book: q.book,
       chapter: q.chapter,
       verse: q.verse,
-      verseText: getVerse(q.book, q.chapter, q.verse)?.text || '',
+      verseText: getVerse(q.book, q.chapter, q.verse, req.translation)?.text || '',
       text: q.text,
       authorId: q.user_id,
       authorLogin: q.author_login,

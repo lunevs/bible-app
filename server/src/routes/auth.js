@@ -4,6 +4,7 @@ import { config } from '../config.js';
 import { db, now } from '../db.js';
 import { getPlan } from '../plans.js';
 import { todayLocal } from '../status.js';
+import { listTranslations } from '../bible.js';
 import {
   normalizeLogin,
   hashPassword,
@@ -40,7 +41,7 @@ authRouter.post('/register', (req, res) => {
     .run(login, loginKey, hashPassword(password), 'user', ts);
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
   createSession(res, user.id);
-  res.json({ user: publicUser(user) });
+  res.json({ user: publicUser(user), translations: listTranslations() });
 });
 
 authRouter.post('/login', (req, res) => {
@@ -62,7 +63,7 @@ authRouter.post('/login', (req, res) => {
 
   resetAttempts(loginKey);
   createSession(res, user.id);
-  res.json({ user: publicUser(user) });
+  res.json({ user: publicUser(user), translations: listTranslations() });
 });
 
 authRouter.post('/change-password', requireAuth, (req, res) => {
@@ -90,7 +91,7 @@ authRouter.post('/logout', (req, res) => {
 });
 
 authRouter.get('/me', (req, res) => {
-  res.json({ user: publicUser(req.user) });
+  res.json({ user: publicUser(req.user), translations: listTranslations() });
 });
 
 // Выбор или смена плана. plan_started_at = сегодня (день выбора) при смене.

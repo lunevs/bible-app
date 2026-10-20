@@ -29,7 +29,7 @@ export default defineConfig({
         // Текст Библии доступен офлайн: кэшируем ответы эндпоинтов чтения.
         runtimeCaching: [
           {
-            urlPattern: /\/api\/reading\/[^/]+\/[^/]+$/,
+            urlPattern: ({ url }) => /^\/api\/reading\/[^/]+\/[^/]+$/.test(url.pathname),
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'bible-text',
@@ -37,7 +37,7 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: /\/api\/(plans)$/,
+            urlPattern: ({ url }) => url.pathname === '/api/plans',
             handler: 'StaleWhileRevalidate',
             options: { cacheName: 'plans' },
           },

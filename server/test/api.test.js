@@ -244,6 +244,31 @@ test('достижение конца без времени не зачитыв�
 });
 
 // --- Заметки ---
+test('переключение перевода не меняет план, активное время, readAt и заметки', async () => {
+  const c = makeClient();
+  await c('POST', '/api/auth/register', { login: 'test_translation', password: '123' });
+  await c('POST', '/api/auth/plan', { planId: 'lite' });
+  await c('POST', '/api/reading/progress', { planId: 'lite', date: '2026-10-19', seconds: 60, reachedEnd: true });
+  const created = await c('POST', '/api/notes', { book: 'Мк', chapter: 1, verse: 15, text: 'Моя заметка', visibility: 'personal' });
+  const before = await c('GET', '/api/reading/lite/2026-10-19');
+  const userBefore = (await c('GET', '/api/auth/me')).data.user;
+  const { translations } = (await c('GET', '/api/translations')).data;
+  assert.ok(translations.some((t) => t.id === 'synodal'));
+  for (const { id } of translations) {
+    const r = await c('GET', `/api/reading/lite/2026-10-19?translation=${id}`);
+    assert.equal(r.status, 200);
+    assert.equal(r.data.translation, id);
+    assert.deepEqual(r.data.progress, before.data.progress);
+    assert.equal(r.data.thresholdSeconds, before.data.thresholdSeconds);
+    assert.equal(r.data.status, before.data.status);
+    assert.deepEqual((await c('GET', '/api/auth/me')).data.user, userBefore);
+    assert.ok(r.data.verses.every((v) => v.text.length > 0));
+    if (id !== 'synodal') assert.notEqual(r.data.verses[0].text, before.data.verses[0].text);
+    const notes = await c('GET', `/api/notes?book=Мк&chapter=1&verse=15&translation=${id}`);
+    assert.ok(notes.data.own.some((n) => n.id === created.data.id && n.text === 'Моя заметка'));
+  }
+  assert.equal((await c('GET', '/api/reading/lite/2026-10-19?translation=unknown')).status, 400);
+});
 
 test('личная заметка не видна другому, открытая видна и лайкается один раз', async () => {
   const author = makeClient();

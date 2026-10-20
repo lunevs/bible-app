@@ -6,7 +6,7 @@ import { api } from '../api.js';
 import { currentVersion, releases } from '../releases.js';
 
 export default function SettingsPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, translation, translations, chooseTranslation } = useAuth();
   const [password, setPassword] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [message, setMessage] = useState('');
@@ -14,6 +14,7 @@ export default function SettingsPage() {
   const [busy, setBusy] = useState(false);
   const [passwordFormOpen, setPasswordFormOpen] = useState(false);
   const [releasesOpen, setReleasesOpen] = useState(false);
+  const [translationMessage, setTranslationMessage] = useState('');
 
   const changePassword = async (event) => {
     event.preventDefault();
@@ -54,6 +55,21 @@ export default function SettingsPage() {
           <span className="text-muted">Начало участия в плане</span>
           <span>{user.planStartedAt ? formatDate(user.planStartedAt) : '—'}</span>
         </div>
+      </div>
+
+      <div className="card-soft p-3 mb-3" role="group" aria-labelledby="bible-translation-heading">
+        <h2 id="bible-translation-heading" className="h6 mb-2">Перевод Библии</h2>
+        {translations.map((t) => (
+          <label key={t.id} className={`translation-option ${translation === t.id ? 'is-selected' : ''}`}>
+            <input type="radio" name="bible-translation" value={t.id} checked={translation === t.id} onChange={() => {
+              chooseTranslation(t.id);
+              setTranslationMessage(`Выбран перевод: ${t.name}`);
+            }} />
+            <span className="translation-indicator" aria-hidden="true">{translation === t.id ? '✓' : ''}</span>
+            <span className="translation-name">{t.name}</span>
+          </label>
+        ))}
+        <div className="translation-confirmation" role="status" aria-live="polite">{translationMessage}</div>
       </div>
 
       <div className="d-grid gap-2">

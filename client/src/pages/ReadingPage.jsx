@@ -6,6 +6,7 @@ import { StatusBadge } from '../components/StatusBadge.jsx';
 import { useReadingTracker } from '../hooks/useReadingTracker.js';
 import { copyText } from '../clipboard.js';
 import CollapsibleNoteText from '../components/CollapsibleNoteText.jsx';
+import { useAuth } from '../auth.jsx';
 
 const BOOK_NAMES = {
   Мф: 'Евангелие от Матфея',
@@ -14,9 +15,10 @@ const BOOK_NAMES = {
   Ин: 'Евангелие от Иоанна',
 };
 
-const verseRef = (v) => `${BOOK_NAMES[v.book] || v.book} ${v.chapter}:${v.verse}`;
+const verseRef = (v) => `${BOOK_NAMES[v.book] || v.book} ${v.chapter}:${v.verseLabel || v.verse}`;
 
 export default function ReadingPage() {
+  const { translation } = useAuth();
   const { planId, date } = useParams();
   const navigate = useNavigate();
   const [entry, setEntry] = useState(null);
@@ -32,7 +34,7 @@ export default function ReadingPage() {
           setStatus(d.status);
         })
         .catch((e) => setError(e.message)),
-    [planId, date]
+    [planId, date, translation]
   );
 
   useEffect(() => {
@@ -126,6 +128,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
       </div>
 
       <div className="text-muted small">{formatDate(entry.date)}</div>
+      <div className="text-muted small">{entry.translationName}</div>
       <h1 className="reading-title mt-1">{entry.label}</h1>
       {entry.special === 'christmas' && (
         <span className="badge text-bg-warning mb-2">Рождественский отрывок</span>
@@ -165,12 +168,13 @@ function Reader({ entry, status, setStatus, onChanged }) {
                 entry.mainVerse &&
                 v.book === entry.mainVerse.book &&
                 v.chapter === entry.mainVerse.chapter &&
-                v.verse === entry.mainVerse.verse;
+                v.verse <= entry.mainVerse.verse &&
+                (v.verseEnd || v.verse) >= entry.mainVerse.verse;
               const isLast = v === entry.verses[entry.verses.length - 1];
               const mine = myNotes[`${v.book}:${v.chapter}:${v.verse}`];
               return (
                 <div
-                  key={`${v.book}-${v.chapter}-${v.verse}`}
+                  key={`${v.book}-${v.chapter}-${v.verse}-${v.verseLabel || ''}`}
                   className={`verse verse-tap ${isMain ? 'main-verse' : ''}`}
                   ref={isLast ? lastVerseRef : null}
                   role="button"
@@ -183,7 +187,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
                     }
                   }}
                 >
-                  <span className="vnum">{v.verse}</span>
+                  <span className="vnum">{v.verseLabel || v.verse}</span>
                   <span className="verse-text">
                     {isMain && <span className="main-verse-tag">Главный стих</span>}
                     {v.text}
@@ -422,10 +426,10 @@ function ViewNotesModal({ verse, onClose, onChanged }) {
   const load = useCallback(
     () =>
       api
-        .get(`/notes?book=${verse.book}&chapter=${verse.chapter}&verse=${verse.verse}`)
+        .get(`/notes?book=${verse.book}&chapter=${verse.chapter}&verse=${verse.verse}&verseEnd=${verse.verseEnd || verse.verse}`)
         .then(setData)
         .catch((e) => setError(e.message)),
-    [verse.book, verse.chapter, verse.verse]
+    [verse.book, verse.chapter, verse.verse, verse.verseEnd]
   );
 
   useEffect(() => {

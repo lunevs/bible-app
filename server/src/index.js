@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import { config, paths } from './config.js';
 import './db.js';
-import { loadBible } from './bible.js';
+import { loadBible, listTranslations } from './bible.js';
 import './plans.js';
 import { attachUser } from './auth.js';
 import { createAdmin } from './bootstrap-admin.js';
@@ -37,6 +37,13 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '256kb' }));
 app.use(cookieParser(config.sessionSecret));
 app.use(attachUser);
+app.use('/api', (req, res, next) => {
+  req.translation = req.query.translation || 'synodal';
+  if (!listTranslations().some((t) => t.id === req.translation)) {
+    return res.status(400).json({ error: 'Перевод недоступен на этом сервере' });
+  }
+  next();
+});
 
 app.use('/api/auth', authRouter);
 app.use('/api', readingRouter);

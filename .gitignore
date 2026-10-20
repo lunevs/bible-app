@@ -21,3 +21,4 @@ client/public/apple-touch-icon.png
 *.log
 .env
 SECURITY_AUDIT.md
+server/private-bible/

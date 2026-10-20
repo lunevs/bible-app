@@ -1,6 +1,13 @@
 // Тонкая обёртка над fetch для работы с API.
+let translation = 'synodal';
+export function setApiTranslation(value) { translation = value; }
+
 async function request(path, { method = 'GET', body } = {}) {
-  const res = await fetch('/api' + path, {
+  const url = new URL('/api' + path, window.location.origin);
+  if (method === 'GET' && path !== '/translations' && path !== '/auth/me') {
+    url.searchParams.set('translation', translation);
+  }
+  const res = await fetch(url, {
     method,
     credentials: 'include',
     headers: body ? { 'Content-Type': 'application/json' } : undefined,

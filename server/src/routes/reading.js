@@ -3,12 +3,15 @@ import express from 'express';
 import { config } from '../config.js';
 import { db, now } from '../db.js';
 import { getPlan, getDay, listPlans } from '../plans.js';
-import { getPassageVerses, getVerse, verseCount } from '../bible.js';
+import { getPassageVerses, getVerse, verseCount, listTranslations } from '../bible.js';
 import { computeStatus, todayLocal } from '../status.js';
 import { userDays } from '../progress.js';
 import { requireAuth } from '../auth.js';
 
 export const readingRouter = express.Router();
+readingRouter.get('/translations', requireAuth, (_req, res) => {
+  res.json({ translations: listTranslations() });
+});
 
 // Порог активного времени для засчитывания чтения (раздел 6 ТЗ).
 export function thresholdFor(ranges) {
@@ -33,14 +36,15 @@ function myNoteMap(userId, verses) {
     )
     .all(...params);
 
-  const wanted = new Set(verses.map((v) => `${v.book}:${v.chapter}:${v.verse}`));
   const map = {};
   for (const r of rows) {
-    const key = `${r.book}:${r.chapter}:${r.verse}`;
-    if (!wanted.has(key)) continue;
-    if (!map[key]) map[key] = { count: 0, personal: false };
-    map[key].count += 1;
-    if (r.visibility === 'personal') map[key].personal = true;
+    for (const v of verses) {
+      if (v.book !== r.book || v.chapter !== r.chapter || r.verse < v.verse || r.verse > (v.verseEnd || v.verse)) continue;
+      const key = `${v.book}:${v.chapter}:${v.verse}`;
+      if (!map[key]) map[key] = { count: 0, personal: false };
+      map[key].count += 1;
+      if (r.visibility === 'personal') map[key].personal = true;
+    }
   }
   return map;
 }
@@ -118,11 +122,13 @@ readingRouter.get('/reading/:planId/:date', requireAuth, (req, res) => {
     participationDate: req.user.plan_started_at,
   });
 
-  const verses = getPassageVerses(day.passage.ranges);
+  const verses = getPassageVerses(day.passage.ranges, req.translation);
 
   res.json({
     planId,
     planName: plan.name,
+    translation: req.translation,
+    translationName: listTranslations().find((t) => t.id === req.translation).name,
     date,
     label: day.passage.label,
     ranges: day.passage.ranges,
@@ -132,7 +138,7 @@ readingRouter.get('/reading/:planId/:date', requireAuth, (req, res) => {
     verses,
     myNotes: myNoteMap(req.user.id, verses),
     mainVerseText: day.mainVerse
-      ? getVerse(day.mainVerse.book, day.mainVerse.chapter, day.mainVerse.verse)
+      ? getVerse(day.mainVerse.book, day.mainVerse.chapter, day.mainVerse.verse, req.translation)
       : null,
     thresholdSeconds: thresholdFor(day.passage.ranges),
     progress: {
