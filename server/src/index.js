@@ -9,7 +9,7 @@ import './db.js';
 import { loadBible, listTranslations } from './bible.js';
 import './plans.js';
 import { attachUser } from './auth.js';
-import { createAdmin } from './bootstrap-admin.js';
+import { ensureBootstrapAdmin } from './bootstrap-admin.js';
 import { authRouter } from './routes/auth.js';
 import { readingRouter } from './routes/reading.js';
 import { notesRouter } from './routes/notes.js';
@@ -21,7 +21,7 @@ import { adminRouter } from './routes/admin.js';
 function bootstrapAdmin() {
   const { login, password } = config.bootstrapAdmin;
   if (!login || !password) return;
-  if (createAdmin(login, password)) {
+  if (ensureBootstrapAdmin(login, password)) {
     console.log(`Создан администратор "${login.trim()}"`);
   }
 }

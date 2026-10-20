@@ -244,6 +244,33 @@ test('достижение конца без времени не зачитыв�
 });
 
 // --- Заметки ---
+test('смена логина сохраняет аккаунт, сессии и прогресс; чужой логин занять нельзя', async () => {
+  const guest = makeClient();
+  assert.equal((await guest('PATCH', '/api/auth/login', { login: 'renamed' })).status, 401);
+  const c = makeClient();
+  const secondSession = makeClient();
+  await c('POST', '/api/auth/register', { login: 'test_rename_old', password: '123' });
+  await secondSession('POST', '/api/auth/login', { login: 'test_rename_old', password: '123' });
+  await c('POST', '/api/auth/plan', { planId: 'lite' });
+  await c('POST', '/api/reading/progress', { planId: 'lite', date: '2026-10-19', seconds: 24, reachedEnd: false });
+  const before = (await c('GET', '/api/auth/me')).data.user;
+  const progress = (await c('GET', '/api/reading/lite/2026-10-19')).data.progress;
+  for (const login of ['', '   ', 42, null]) {
+    assert.equal((await c('PATCH', '/api/auth/login', { login })).status, 400);
+  }
+  const other = makeClient();
+  await other('POST', '/api/auth/register', { login: 'test_rename_taken', password: '123' });
+  assert.equal((await c('PATCH', '/api/auth/login', { login: ' TEST_RENAME_TAKEN ' })).status, 409);
+  const renamed = await c('PATCH', '/api/auth/login', { login: ' Test_Rename_New ' });
+  assert.equal(renamed.status, 200);
+  assert.deepEqual(renamed.data.user, { ...before, login: 'Test_Rename_New' });
+  assert.deepEqual((await secondSession('GET', '/api/auth/me')).data.user, renamed.data.user);
+  assert.deepEqual((await c('GET', '/api/reading/lite/2026-10-19')).data.progress, progress);
+  assert.equal((await c('PATCH', '/api/auth/login', { login: 'test_rename_new' })).status, 200);
+  assert.equal((await makeClient()('POST', '/api/auth/login', { login: 'test_rename_old', password: '123' })).status, 401);
+  assert.equal((await makeClient()('POST', '/api/auth/login', { login: 'TEST_RENAME_NEW', password: '123' })).status, 200);
+});
+
 test('переключение перевода не меняет план, активное время, readAt и заметки', async () => {
   const c = makeClient();
   await c('POST', '/api/auth/register', { login: 'test_translation', password: '123' });

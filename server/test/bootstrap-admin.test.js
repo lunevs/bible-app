@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 
 process.env.DB_PATH = ':memory:';
 const { db } = await import('../src/db.js');
-const { createAdmin } = await import('../src/bootstrap-admin.js');
+const { createAdmin, ensureBootstrapAdmin } = await import('../src/bootstrap-admin.js');
 const { hashPassword } = await import('../src/auth.js');
 after(() => db.close());
 
@@ -24,6 +24,21 @@ test('bootstrap отказывает при занятом обычным пол
   const before = db.prepare('SELECT * FROM users WHERE login_key = ?').get('member');
   assert.throws(() => createAdmin(' MEMBER ', 'admin-password'), /повышение прав не поддерживается/);
   assert.deepEqual(db.prepare('SELECT * FROM users WHERE id = ?').get(before.id), before);
+});
+
+test('первый администратор после переименования не создаётся заново по старому логину', () => {
+  assert.equal(ensureBootstrapAdmin('admin', 'unused-password'), false);
+  const user = db.prepare('SELECT * FROM users WHERE login_key = ?').get('admin');
+  const before = db.prepare('SELECT COUNT(*) n FROM users').get().n;
+  db.prepare('UPDATE users SET login = ?, login_key = ? WHERE id = ?').run('renamed_admin', 'renamed_admin', user.id);
+  assert.equal(ensureBootstrapAdmin('admin', 'unused-password'), false);
+  assert.equal(db.prepare('SELECT COUNT(*) n FROM users').get().n, before);
+  assert.equal(db.prepare('SELECT id FROM users WHERE login_key = ?').get('admin'), undefined);
+  assert.equal(db.prepare('SELECT password_hash FROM users WHERE id = ?').get(user.id).password_hash, user.password_hash);
+  db.prepare('INSERT INTO users (login, login_key, password_hash, created_at) VALUES (?, ?, ?, ?)')
+    .run('admin', 'admin', 'ordinary-user-hash', 1);
+  assert.equal(ensureBootstrapAdmin('admin', 'unused-password'), false);
+  assert.equal(db.prepare('SELECT role FROM users WHERE login_key = ?').get('admin').role, 'user');
 });
 
 test('сервер прекращает запуск при коллизии bootstrap, CLI также отказывает в повышении', () => {

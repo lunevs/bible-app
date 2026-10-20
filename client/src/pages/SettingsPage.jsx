@@ -6,7 +6,7 @@ import { api } from '../api.js';
 import { currentVersion, releases } from '../releases.js';
 
 export default function SettingsPage() {
-  const { user, logout, translation, translations, chooseTranslation } = useAuth();
+  const { user, setUser, logout, translation, translations, chooseTranslation } = useAuth();
   const [password, setPassword] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [message, setMessage] = useState('');
@@ -15,6 +15,28 @@ export default function SettingsPage() {
   const [passwordFormOpen, setPasswordFormOpen] = useState(false);
   const [releasesOpen, setReleasesOpen] = useState(false);
   const [translationMessage, setTranslationMessage] = useState('');
+  const [editingLogin, setEditingLogin] = useState(false);
+  const [loginDraft, setLoginDraft] = useState('');
+  const [loginBusy, setLoginBusy] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [loginMessage, setLoginMessage] = useState('');
+
+  const saveLogin = async (event) => {
+    event.preventDefault();
+    if (loginBusy || !loginDraft.trim()) return;
+    setLoginBusy(true);
+    setLoginError('');
+    try {
+      const result = await api.patch('/auth/login', { login: loginDraft });
+      setUser(result.user);
+      setEditingLogin(false);
+      setLoginMessage('Логин сохранён. Используйте его при следующем входе.');
+    } catch (e) {
+      setLoginError(e.message);
+    } finally {
+      setLoginBusy(false);
+    }
+  };
 
   const changePassword = async (event) => {
     event.preventDefault();
@@ -43,10 +65,26 @@ export default function SettingsPage() {
       <h1 className="h5 mb-3">Настройки приложения</h1>
 
       <div className="card-soft p-3 mb-3">
-        <div className="d-flex justify-content-between">
+        <div className="profile-login-row">
           <span className="text-muted">Пользователь</span>
-          <span className="fw-semibold">{user.login}</span>
+          {editingLogin ? (
+            <form className="profile-login-control" onSubmit={saveLogin}>
+              <input className="form-control" aria-label="Новый логин" autoComplete="username" autoCapitalize="none" spellCheck={false} required autoFocus value={loginDraft} disabled={loginBusy} onChange={(e) => { setLoginDraft(e.target.value); setLoginError(''); }} onKeyDown={(e) => {
+                if (e.key === 'Escape' && !loginBusy) { setEditingLogin(false); setLoginError(''); }
+              }} />
+              <button type="submit" className="icon-btn" aria-label="Сохранить логин" title="Сохранить логин" disabled={loginBusy || !loginDraft.trim()}>{loginBusy ? '…' : '💾'}</button>
+            </form>
+          ) : (
+            <div className="profile-login-control">
+              <span className="fw-semibold profile-login-name" title={user.login}>{user.login}</span>
+              <button type="button" className="icon-btn" aria-label="Изменить логин" title="Изменить логин" onClick={() => {
+                setLoginDraft(user.login); setLoginError(''); setLoginMessage(''); setEditingLogin(true);
+              }}><span className="profile-login-pencil" aria-hidden="true">✏️</span></button>
+            </div>
+          )}
         </div>
+        {loginError && <div className="text-danger small mt-1" role="alert">{loginError}</div>}
+        {loginMessage && <div className="text-success small mt-1" role="status">{loginMessage}</div>}
         <div className="d-flex justify-content-between mt-2">
           <span className="text-muted">Роль</span>
           <span>{user.role === 'admin' ? 'администратор' : 'пользователь'}</span>

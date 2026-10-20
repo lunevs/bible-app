@@ -623,6 +623,13 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 .translation-confirmation { color: var(--brand); font-size: 0.85rem; line-height: 1.4; overflow-wrap: anywhere; }
 .translation-confirmation:not(:empty) { margin-top: 12px; }
 
+.profile-login-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; }
+.profile-login-control { display: flex; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0; max-width: 100%; flex: 1 1 180px; margin: 0; }
+.profile-login-control .form-control { min-width: 0; width: 100%; font-size: max(16px, 1rem); }
+.profile-login-control .icon-btn { flex-shrink: 0; }
+.profile-login-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-login-pencil { display: inline-block; transform: scaleX(-1); }
+
 .questions-page { padding-bottom: 28px !important; }
 .question-card { padding: 13px 14px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: 0 2px 10px rgba(38, 51, 46, 0.035); }
 .question-meta, .answer-meta { display: flex; align-items: baseline; gap: 8px; color: var(--muted); font-size: 0.76rem; }

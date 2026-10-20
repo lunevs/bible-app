@@ -107,6 +107,11 @@ CREATE TABLE IF NOT EXISTS login_attempts (
   first_fail_at INTEGER,
   locked_until  INTEGER
 );
+
+CREATE TABLE IF NOT EXISTS bootstrap_admin (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  user_id INTEGER NOT NULL REFERENCES users(id)
+);
 `);
 
 export const now = () => Date.now();

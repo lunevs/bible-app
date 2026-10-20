@@ -85,6 +85,22 @@ authRouter.post('/change-password', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
+authRouter.patch('/login', requireAuth, (req, res) => {
+  if (typeof req.body?.login !== 'string' || !req.body.login.trim()) {
+    return res.status(400).json({ error: 'Укажите логин' });
+  }
+  const login = req.body.login.trim();
+  const loginKey = normalizeLogin(login);
+  const occupied = db.prepare('SELECT id FROM users WHERE login_key = ?').get(loginKey);
+  if (occupied && occupied.id !== req.user.id) {
+    return res.status(409).json({ error: 'Такой логин уже занят' });
+  }
+  db.prepare('UPDATE users SET login = ?, login_key = ? WHERE id = ?').run(login, loginKey, req.user.id);
+  resetAttempts(req.user.login_key);
+  resetAttempts(loginKey);
+  res.json({ user: publicUser(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+});
+
 authRouter.post('/logout', (req, res) => {
   destroySession(req, res);
   res.json({ ok: true });
