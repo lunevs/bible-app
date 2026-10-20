@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { formatDate } from '../dates.js';
 import { api } from '../api.js';
+import { currentVersion, releases } from '../releases.js';
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
@@ -12,6 +13,7 @@ export default function SettingsPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [passwordFormOpen, setPasswordFormOpen] = useState(false);
+  const [releasesOpen, setReleasesOpen] = useState(false);
 
   const changePassword = async (event) => {
     event.preventDefault();
@@ -108,12 +110,38 @@ export default function SettingsPage() {
             Панель администратора
           </Link>
         )}
+        <button
+          type="button"
+          className="btn btn-outline-secondary"
+          aria-expanded={releasesOpen}
+          aria-controls="release-notes"
+          onClick={() => setReleasesOpen((open) => !open)}
+        >
+          Что нового · {currentVersion}
+        </button>
+        {releasesOpen && (
+          <section id="release-notes" className="card-soft p-3" aria-label="История обновлений">
+            <h2 className="h6 mb-3">История обновлений</h2>
+            {releases.map((release, index) => (
+              <article key={release.version} className={index ? 'border-top pt-3 mt-3' : ''}>
+                <h3 className="h6 mb-1">
+                  {release.version}{index === 0 && <span className="badge text-bg-light ms-2">Текущая</span>}
+                </h3>
+                <time className="text-muted small" dateTime={release.date}>{formatDate(release.date)}</time>
+                <ul className="small mt-2 mb-0 ps-3">
+                  {release.changes.map((change) => <li key={change}>{change}</li>)}
+                </ul>
+              </article>
+            ))}
+          </section>
+        )}
         <button className="btn btn-outline-danger" onClick={logout}>
           Выйти
         </button>
       </div>
 
       <p className="text-muted small mt-4">
+        Версия {currentVersion}.{' '}
         Приложение для совместного чтения Евангелий. Текст — Синодальный перевод (1876),
         общественное достояние.
       </p>
