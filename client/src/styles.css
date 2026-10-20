@@ -568,6 +568,12 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 .note-card { border-radius: 14px; padding: 14px; }
 .open-notes-page .note-card.note-open { padding-bottom: 6px; }
+.note-feed-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.note-feed-meta > span { min-width: 0; overflow-wrap: anywhere; }
+.note-scripture { margin-top: 6px; }
+.note-scripture summary { padding: 8px 0; color: var(--brand); font-size: 0.9rem; cursor: pointer; overflow-wrap: anywhere; }
+.note-scripture summary span { color: var(--muted); }
+.note-scripture blockquote { margin: 0 0 10px; padding: 10px 12px; border-left: 3px solid var(--brand); border-radius: 0 8px 8px 0; background: #f2f2ec; color: #3b4841; font-family: Georgia, "Times New Roman", serif; line-height: 1.6; overflow-wrap: anywhere; }
 .note-personal { background: #f4f7f4; border-left-color: var(--brand); }
 .note-open { border-left-color: #67896d; }
 .note-text { line-height: 1.6; overflow-wrap: anywhere; }
@@ -580,6 +586,9 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 .modal-verse-text { background: #f2f2ec; line-height: 1.65; }
 .sheet { background: var(--surface); }
 .sheet-item { min-height: 50px; }
+.sheet-item:not(.sheet-cancel) { display: flex; align-items: center; gap: 10px; }
+.sheet-action-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 24px; width: 24px; height: 24px; font-size: 20px; line-height: 1; }
+.sheet-question-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #dce9e2; color: #315d50; font-family: system-ui, sans-serif; font-size: 15px; font-weight: 700; line-height: 1; }
 
 .leader-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; min-height: 72px; border: 1px solid var(--line); }
 .leader-member { min-width: 0; }

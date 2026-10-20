@@ -290,6 +290,8 @@ test('лента заметок сообщает, поставил ли поль
   assert.ok(note);
   assert.equal(note.likedByMe, false);
   assert.equal(note.isMine, false);
+  const { getVerse } = await import('../src/bible.js');
+  assert.equal(note.verseText, getVerse('Мк', 1, 16).text);
 
   const id = note.id;
   await reader('POST', `/api/notes/${id}/like`);

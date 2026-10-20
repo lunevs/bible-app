@@ -2,7 +2,7 @@
 import express from 'express';
 import { config } from '../config.js';
 import { db, now } from '../db.js';
-import { getBook } from '../bible.js';
+import { getBook, getVerse } from '../bible.js';
 import { requireAuth } from '../auth.js';
 
 export const notesRouter = express.Router();
@@ -179,6 +179,7 @@ notesRouter.get('/notes/open', requireAuth, (req, res) => {
   res.json({
     notes: rows.map(({ liked_by_me, ...n }) => ({
       ...n,
+      verseText: getVerse(n.book, n.chapter, n.verse)?.text || '',
       likedByMe: Boolean(liked_by_me),
       isMine: n.user_id === req.user.id,
     })),

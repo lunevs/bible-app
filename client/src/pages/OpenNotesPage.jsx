@@ -37,12 +37,16 @@ export default function OpenNotesPage() {
 
       {notes.map((n) => (
         <div key={n.id} className="note-card note-open mb-2">
-          <div className="d-flex justify-content-between">
+          <div className="note-feed-meta">
             <span className="text-muted small">{n.author_login}</span>
             <span className="text-muted small">
-              {n.book} {n.chapter}:{n.verse} · {formatTime(n.updated_at)}
+              {formatTime(n.updated_at)}
             </span>
           </div>
+          <details className="note-scripture">
+            <summary>{n.book} {n.chapter}:{n.verse} · <span>Текст стиха</span></summary>
+            <blockquote>{n.verseText || 'Текст стиха недоступен.'}</blockquote>
+          </details>
           <CollapsibleNoteText text={n.text} className="mt-1" />
           <button
             type="button"

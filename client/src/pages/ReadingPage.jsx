@@ -284,13 +284,16 @@ function ActionSheet({ verse, onClose, onAddNote, onAskQuestion, onCopy }) {
           <div className="sheet-verse-text">{verse.text}</div>
         </div>
         <button className="sheet-item" onClick={onAddNote}>
-          📝 Добавить заметку
+          <span className="sheet-action-icon" aria-hidden="true">📝</span>
+          <span>Добавить заметку</span>
         </button>
-        <button className="sheet-item" onClick={onAskQuestion}>
-          ❔ Задать вопрос
+        <button className="sheet-item sheet-question" onClick={onAskQuestion}>
+          <span className="sheet-action-icon" aria-hidden="true"><span className="sheet-question-icon">?</span></span>
+          <span>Задать вопрос</span>
         </button>
         <button className="sheet-item" onClick={onCopy}>
-          📋 Копировать
+          <span className="sheet-action-icon" aria-hidden="true">📋</span>
+          <span>Копировать</span>
         </button>
         <button className="sheet-item sheet-cancel" onClick={onClose}>
           Отмена
