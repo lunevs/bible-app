@@ -26,9 +26,9 @@ export default function ReadingPage() {
   const [status, setStatus] = useState(null);
 
   const load = useCallback(
-    () =>
+    (fresh = false) =>
       api
-        .get(`/reading/${planId}/${date}`)
+        .get(`/reading/${planId}/${date}`, { fresh })
         .then((d) => {
           setEntry(d);
           setStatus(d.status);
@@ -55,10 +55,24 @@ export default function ReadingPage() {
   }
   if (!entry) return <div className="container py-4 text-muted">Загрузка…</div>;
 
-  return <Reader entry={entry} status={status} setStatus={setStatus} onChanged={load} />;
+  const noteAdded = (note) => {
+    setEntry((current) => {
+      if (!current) return current;
+      const myNotes = { ...current.myNotes };
+      for (const v of current.verses) {
+        if (v.book !== note.book || v.chapter !== note.chapter || note.verse < v.verse || note.verse > (v.verseEnd || v.verse)) continue;
+        const key = `${v.book}:${v.chapter}:${v.verse}`;
+        const previous = myNotes[key];
+        myNotes[key] = { count: (previous?.count || 0) + 1, personal: !!previous?.personal || note.visibility === 'personal' };
+      }
+      return { ...current, myNotes };
+    });
+  };
+
+  return <Reader entry={entry} status={status} setStatus={setStatus} onNoteAdded={noteAdded} onChanged={() => load(true)} />;
 }
 
-function Reader({ entry, status, setStatus, onChanged }) {
+function Reader({ entry, status, setStatus, onChanged, onNoteAdded }) {
   const navigate = useNavigate();
   const lastVerseRef = useRef(null);
 
@@ -68,7 +82,7 @@ function Reader({ entry, status, setStatus, onChanged }) {
   const [viewVerse, setViewVerse] = useState(null); // окно «Заметки»
   const [toast, setToast] = useState('');
 
-  const timerDuration = entry.verses.length * 2;
+  const timerDuration = entry.thresholdSeconds;
   const { remainingSeconds, credited, markReachedEnd } = useReadingTracker({
     planId: entry.planId,
     date: entry.date,
@@ -233,10 +247,10 @@ function Reader({ entry, status, setStatus, onChanged }) {
         <AddNoteModal
           verse={addVerse}
           onClose={() => setAddVerse(null)}
-          onAdded={() => {
+          onAdded={(note) => {
+            onNoteAdded(note);
             setAddVerse(null);
             setToast('Заметка добавлена');
-            onChanged();
           }}
         />
       )}
@@ -326,7 +340,7 @@ function AddNoteModal({ verse, onClose, onAdded }) {
         text,
         visibility,
       });
-      onAdded?.();
+      onAdded?.({ book: verse.book, chapter: verse.chapter, verse: verse.verse, visibility });
     } catch (e) {
       setError(e.message);
     } finally {

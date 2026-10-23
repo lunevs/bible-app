@@ -29,8 +29,8 @@ export default defineConfig({
         // Текст Библии доступен офлайн: кэшируем ответы эндпоинтов чтения.
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => /^\/api\/reading\/[^/]+\/[^/]+$/.test(url.pathname),
-            handler: 'StaleWhileRevalidate',
+            urlPattern: ({ url, request }) => request.cache !== 'no-store' && /^\/api\/reading\/[^/]+\/[^/]+$/.test(url.pathname),
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'bible-text',
               expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 60 },

@@ -2,7 +2,7 @@
 let translation = 'synodal';
 export function setApiTranslation(value) { translation = value; }
 
-async function request(path, { method = 'GET', body } = {}) {
+async function request(path, { method = 'GET', body, fresh = false } = {}) {
   const url = new URL('/api' + path, window.location.origin);
   if (method === 'GET' && path !== '/translations' && path !== '/auth/me') {
     url.searchParams.set('translation', translation);
@@ -10,6 +10,7 @@ async function request(path, { method = 'GET', body } = {}) {
   const res = await fetch(url, {
     method,
     credentials: 'include',
+    ...(fresh ? { cache: 'no-store' } : {}),
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
     body: body ? JSON.stringify(body) : undefined,
   });
@@ -24,7 +25,7 @@ async function request(path, { method = 'GET', body } = {}) {
 }
 
 export const api = {
-  get: (p) => request(p),
+  get: (p, options = {}) => request(p, { ...options, method: 'GET' }),
   post: (p, body) => request(p, { method: 'POST', body }),
   patch: (p, body) => request(p, { method: 'PATCH', body }),
   del: (p) => request(p, { method: 'DELETE' }),

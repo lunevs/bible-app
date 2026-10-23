@@ -55,7 +55,7 @@ export default function AdminPage() {
               </div>
               <div className="text-muted small">
                 {u.planId ? `план: ${u.planId}` : 'план не выбран'}
-                {u.planId ? ` · ${pointsLabel(u.summary.points)}` : ''}
+                {` · ${pointsLabel(u.summary.points)}`}
               </div>
             </div>
             <div className="d-flex gap-1 admin-user-actions">

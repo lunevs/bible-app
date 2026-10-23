@@ -358,6 +358,39 @@ test('лента заметок сообщает, поставил ли поль
   assert.equal(ownNote.likedByMe, false);
 });
 
+test('фильтры ленты независимы и не раскрывают чужие личные заметки даже администратору', async () => {
+  const guest = makeClient();
+  assert.equal((await guest('GET', '/api/notes/feed')).status, 401);
+  const author = makeClient();
+  const other = makeClient();
+  const admin = makeClient();
+  await author('POST', '/api/auth/register', { login: 'test_feed_private', password: '123' });
+  await other('POST', '/api/auth/register', { login: 'test_feed_viewer', password: '123' });
+  await admin('POST', '/api/auth/login', { login: 'admin', password: 'admin123' });
+  const payload = { book: 'Ин', chapter: 1, verse: 4, text: 'Тестовая заметка' };
+  const privateId = (await author('POST', '/api/notes', { ...payload, visibility: 'personal' })).data.id;
+  const publicId = (await author('POST', '/api/notes', { ...payload, visibility: 'open' })).data.id;
+  const otherId = (await other('POST', '/api/notes', { ...payload, visibility: 'personal' })).data.id;
+  const combined = (await author('GET', '/api/notes/feed')).data.notes;
+  assert.ok(combined.some((n) => n.id === privateId && n.isMine && n.verseText));
+  assert.ok(combined.some((n) => n.id === publicId));
+  assert.ok(!combined.some((n) => n.id === otherId));
+  const personal = (await author('GET', '/api/notes/feed?personal=1&public=0')).data.notes;
+  assert.ok(personal.some((n) => n.id === privateId));
+  assert.ok(personal.every((n) => n.visibility === 'personal' && n.isMine));
+  const publicNotes = (await author('GET', '/api/notes/feed?personal=0&public=1')).data.notes;
+  assert.ok(publicNotes.some((n) => n.id === publicId));
+  assert.ok(publicNotes.every((n) => n.visibility === 'open'));
+  assert.deepEqual((await author('GET', '/api/notes/feed?personal=0&public=0')).data.notes, []);
+  assert.equal((await author('GET', '/api/notes/feed?personal=invalid')).status, 400);
+  for (const client of [other, admin]) {
+    const notes = (await client('GET', '/api/notes/feed')).data.notes;
+    assert.ok(!notes.some((n) => n.id === privateId));
+    assert.ok(notes.some((n) => n.id === publicId));
+  }
+  assert.ok(!(await author('GET', '/api/notes/open')).data.notes.some((n) => n.id === privateId));
+});
+
 test('вопросы публичны, ответы загружаются отдельно и авторы управляют своими публикациями', async () => {
   const author = makeClient();
   const participant = makeClient();
@@ -451,6 +484,29 @@ test('доска лидеров доступна только с активно�
   assert.deepEqual(loggedOut.data, { error: 'Требуется вход' });
 });
 
+test('персональный вариант статуса стабилен в течение дня на разных сессиях аккаунта', async () => {
+  const first = makeClient();
+  const second = makeClient();
+  await first('POST', '/api/auth/register', { login: 'test_daily_status', password: '123' });
+  await second('POST', '/api/auth/login', { login: 'test_daily_status', password: '123' });
+  const before = (await first('GET', '/api/leaderboard')).data;
+  assert.equal(before.dailyStatus.date, '2026-10-19');
+  assert.ok([0, 1, 2].includes(before.dailyStatus.choice));
+  assert.ok(before.statusRefreshInMs > 0 && before.statusRefreshInMs <= 86400000);
+  assert.deepEqual((await second('GET', '/api/leaderboard')).data.dailyStatus, before.dailyStatus);
+  await first('PATCH', '/api/auth/login', { login: 'test_daily_renamed' });
+  assert.deepEqual((await first('GET', '/api/leaderboard')).data.dailyStatus, before.dailyStatus);
+  const originalTime = Date.now();
+  try {
+    mock.timers.setTime(new Date('2026-10-20T10:00:00Z').getTime());
+    const next = (await first('GET', '/api/leaderboard')).data;
+    assert.equal(next.dailyStatus.date, '2026-10-20');
+    assert.ok([0, 1, 2].includes(next.dailyStatus.choice));
+  } finally {
+    mock.timers.setTime(originalTime);
+  }
+});
+
 test('доска лидеров: баллы и сортировка', async () => {
   const c = makeClient();
   await c('POST', '/api/auth/register', { login: 'test_lead', password: '123' });
@@ -466,7 +522,7 @@ test('доска лидеров: баллы и сортировка', async () =
   }
 });
 
-test('лайк добавляет 1 балл к 5 баллам за своевременное чтение', async () => {
+test('чтение, заметка и полученный лайк суммируются в рейтинге', async () => {
   const author = makeClient();
   const fan = makeClient();
   await author('POST', '/api/auth/register', { login: 'test_liked_author', password: '123' });
@@ -486,7 +542,7 @@ test('лайк добавляет 1 балл к 5 баллам за своевр
   assert.equal(me.likes, 1);
   assert.equal(me.likePoints, 1);
   assert.equal(me.readingPoints, 5);
-  assert.equal(me.points, 6);
+  assert.equal(me.points, 7);
 });
 
 test('снятие лайка убирает балл', async () => {
@@ -502,7 +558,35 @@ test('снятие лайка убирает балл', async () => {
   const { data } = await fan('GET', '/api/leaderboard');
   const me = data.leaderboard.find((u) => u.login === 'test_unliked_author');
   assert.equal(me.likes, 0);
-  assert.equal(me.points, 0);
+  assert.equal(me.points, 1); // Балл за саму заметку сохраняется.
+});
+
+test('каждая заметка даёт балл без плана, смена видимости и правка не начисляют повторно, удаление снимает балл', async () => {
+  const author = makeClient();
+  const admin = makeClient();
+  const login = 'test_note_points';
+  await author('POST', '/api/auth/register', { login, password: '123' });
+  await admin('POST', '/api/auth/login', { login: 'admin', password: 'admin123' });
+  const score = async () => (await author('GET', '/api/leaderboard')).data.leaderboard.find((u) => u.login === login).points;
+  assert.equal(await score(), 0);
+  const payload = { book: 'Мк', chapter: 1, verse: 15, text: 'Мысль' };
+  const personal = (await author('POST', '/api/notes', { ...payload, visibility: 'personal' })).data.id;
+  assert.equal(await score(), 1);
+  const open = (await author('POST', '/api/notes', { ...payload, visibility: 'open' })).data.id;
+  assert.equal(await score(), 2);
+  const row = (await author('GET', '/api/leaderboard')).data.leaderboard.find((u) => u.login === login);
+  assert.equal(row.notePoints, 2);
+  assert.equal(row.points, row.readingPoints + row.likePoints + row.notePoints);
+  await author('PATCH', `/api/notes/${personal}`, { text: 'Новая мысль', visibility: 'open' });
+  await author('PATCH', `/api/notes/${open}`, { visibility: 'personal' });
+  assert.equal(await score(), 2);
+  const me = (await author('GET', '/api/auth/me')).data.user;
+  const adminView = (await admin('GET', '/api/admin/users')).data.users.find((u) => u.id === me.id);
+  assert.equal(adminView.summary.points, 2);
+  await author('DELETE', `/api/notes/${open}`);
+  assert.equal(await score(), 1);
+  await admin('DELETE', `/api/admin/notes/${personal}`);
+  assert.equal(await score(), 0);
 });
 
 // --- Администратор ---

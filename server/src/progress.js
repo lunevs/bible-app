@@ -70,11 +70,14 @@ export function userSummary(user, planId = user.plan_id, nowTs = Date.now()) {
   }
   const likes = likesReceived(user.id);
   const likePoints = likes * LIKE_POINTS;
+  // Учитываются все существующие заметки автора независимо от видимости и плана.
+  const notePoints = db.prepare('SELECT COUNT(*) c FROM notes WHERE user_id = ?').get(user.id).c;
   return {
-    points: readingPoints + likePoints,
+    points: readingPoints + likePoints + notePoints,
     readingPoints,
     likes,
     likePoints,
+    notePoints,
     green,
     blue,
     missed,

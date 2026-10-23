@@ -27,6 +27,15 @@ export function loadBible(translation = 'synodal') {
     );
   }
   const data = JSON.parse(fs.readFileSync(edition.file, 'utf8'));
+  // Совместимость с уже импортированными РБО-файлами: это наша старая
+  // служебная заглушка, а не текст Писания.
+  if (translation === 'rbo') {
+    for (const book of Object.values(data.books)) {
+      book.chapters = book.chapters.map((chapter) => chapter.filter((v) =>
+        v.t !== 'В предоставленном файле нет отдельного текста этого стиха.'
+      ));
+    }
+  }
   cache.set(translation, data);
   return data;
 }
@@ -57,7 +66,7 @@ export function getPassageVerses(ranges, translation = 'synodal') {
       const verses = book.chapters[ch - 1];
       if (!verses) continue;
       const from = ch === startCh && r.startVerse != null ? r.startVerse : 1;
-      const to = ch === endCh && r.endVerse != null ? r.endVerse : verses.length;
+      const to = ch === endCh && r.endVerse != null ? r.endVerse : Infinity;
       for (const v of verses) {
         const key = `${r.book}:${ch}:${v.v}:${v.endVerse || v.v}`;
         if ((v.endVerse || v.v) >= from && v.v <= to && !seen.has(key)) {

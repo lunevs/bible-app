@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getPlan } from '../src/plans.js';
-import { verseCount, getPassageVerses, getVerse } from '../src/bible.js';
+import { verseCount, getPassageVerses, getVerse, listTranslations } from '../src/bible.js';
 import { thresholdFor } from '../src/routes/reading.js';
 import { config } from '../src/config.js';
 
@@ -47,4 +47,16 @@ test('для короткого отрывка порог тоже равен д
   // Искусственный диапазон из 3 стихов: 3×2 = 6 секунд.
   const ranges = [{ book: 'Ин', startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 3 }];
   assert.equal(thresholdFor(ranges), 6);
+});
+
+test('в РБО пропущенные стихи не заменяются заглушкой и конец главы не обрезается', {
+  skip: !listTranslations().some((t) => t.id === 'rbo'),
+}, () => {
+  const ranges = [{ book: 'Мк', startChapter: 7, startVerse: 15, endChapter: 7, endVerse: 17 }];
+  assert.deepEqual(getPassageVerses(ranges, 'rbo').map((v) => v.verse), [15, 17]);
+  assert.equal(getVerse('Мк', 7, 16, 'rbo'), null);
+  assert.equal(thresholdFor(ranges), 6); // Порог по плану не меняется от перевода.
+  const chapter = getPassageVerses([{ book: 'Мк', startChapter: 7 }], 'rbo');
+  assert.equal(chapter.at(-1).verse, 37);
+  assert.ok(chapter.every((v) => !v.text.includes('В предоставленном файле')));
 });

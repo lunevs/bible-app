@@ -64,7 +64,7 @@ with zipfile.ZipFile(p) as z:
   assert all(v['t'] for ch in chapters for v in ch),code
   result[code]={'name':name,'chapters':chapters}
 # В EPUB часть номеров потеряна внутри абзацев. Не делим текст по догадке:
-# сохраняем такие абзацы объединённым диапазоном. Пропуски нумерации обозначаем явно.
+# сохраняем такие абзацы объединённым диапазоном. Отсутствующие стихи не добавляем.
 merged={'Мф':{3:[8],6:[33]},'Мк':{14:[55]},'Лк':{2:[7],17:[7],19:[25],23:[25]},'Ин':{19:[9],20:[5]}}
 canonical=json.loads((Path(__file__).resolve().parents[1]/'data/bible/synodal.json').read_text())
 for code,book in result.items():
@@ -74,8 +74,6 @@ for code,book in result.items():
    if verse in merged.get(code,{}).get(i+1,[]):
     previous=next(v for v in ch if v['v']==verse-1)
     previous['endVerse']=verse;previous['label']=str(previous['v'])+'–'+str(verse)
-   else:
-    ch.append({'v':verse,'t':'В предоставленном файле нет отдельного текста этого стиха.'})
   ch.sort(key=lambda v:v['v'])
 (out/'rbo.json').write_text(json.dumps({'translation':'Современный русский перевод (РБО, 2011)','source':'Предоставленный пользователем EPUB РБО','books':result},ensure_ascii=False))
 for file in out.glob('*.json'):

@@ -191,6 +191,7 @@ body {
   margin-bottom: 8px;
 }
 .leader-rank { width: 28px; font-weight: 700; color: var(--muted); text-align: center; }
+.leader-rank.leader-emoji { font-size: 24px; line-height: 1.2; font-weight: 400; }
 .leader-points { margin-left: auto; font-weight: 700; color: var(--brand); }
 
 .thought-box {
@@ -568,6 +569,10 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 .note-card { border-radius: 14px; padding: 14px; }
 .open-notes-page .note-card.note-open { padding-bottom: 6px; }
+.notes-filters { display: flex; align-items: center; gap: 24px; }
+.notes-filters label { cursor: pointer; }
+.notes-filters .form-check-input:checked { background-color: var(--brand); border-color: var(--brand); }
+.notes-filters .form-check-input:focus { border-color: var(--brand); box-shadow: 0 0 0 0.2rem rgba(49, 93, 80, 0.15); }
 .note-feed-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
 .note-feed-meta > span { min-width: 0; overflow-wrap: anywhere; }
 .note-scripture { margin-top: 6px; }
@@ -605,6 +610,10 @@ h1, h2, h3, .h1, .h2, .h3, .h4, .h5, .h6 {
 .leaderboard-columns + .leader-row { margin-top: 0; }
 .leader-details { display: flex; flex-wrap: wrap; gap: 5px 12px; margin-top: 4px; color: var(--muted); font-size: 0.77rem; }
 .leader-details > span { display: inline-flex; align-items: center; gap: 5px; }
+.leader-note-icon { width: 14px; height: 14px; flex-shrink: 0; }
+.leader-personal-status { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid #d9e5dc; border-radius: 15px; background: #edf3ee; }
+.leader-status-emoji { flex-shrink: 0; font-size: 32px; line-height: 1.2; }
+.leader-personal-status p { min-width: 0; margin: 0; color: var(--brand-dark); font-size: 1rem; line-height: 1.5; overflow-wrap: anywhere; }
 .leader-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #829486; }
 .leader-dot.late { background: #8293a0; }
 .leader-points { min-width: 44px; text-align: right; font-size: 1.05rem; }

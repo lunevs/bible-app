@@ -17,7 +17,7 @@ adminRouter.get('/users', (_req, res) => {
   res.json({
     users: users.map((u) => {
       const base = publicUser(u);
-      const s = u.plan_id ? userSummary(u) : { points: 0, green: 0, blue: 0, missed: 0, total: 0 };
+      const s = userSummary(u);
       return { ...base, summary: s, createdAt: u.created_at };
     }),
   });

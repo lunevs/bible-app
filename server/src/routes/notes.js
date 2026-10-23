@@ -168,18 +168,19 @@ notesRouter.post('/notes/:id/like', requireAuth, (req, res) => {
   res.json({ liked: !existing, likes: count });
 });
 
-// Все открытые заметки (лента группы) — опционально, для просмотра.
-notesRouter.get('/notes/open', requireAuth, (req, res) => {
+// Лента: публичные заметки и только собственные личные.
+function sendNoteFeed(req, res, personal, publicNotes) {
   const rows = db
     .prepare(
       `SELECT n.*, u.login AS author_login,
               (SELECT COUNT(*) FROM likes l WHERE l.note_id = n.id) AS likes,
               EXISTS(SELECT 1 FROM likes mine WHERE mine.note_id = n.id AND mine.user_id = ?) AS liked_by_me
        FROM notes n JOIN users u ON u.id = n.user_id
-       WHERE n.visibility = 'open'
+       WHERE (? = 1 AND n.visibility = 'personal' AND n.user_id = ?)
+          OR (? = 1 AND n.visibility = 'open')
        ORDER BY n.updated_at DESC LIMIT 200`
     )
-    .all(req.user.id);
+    .all(req.user.id, personal ? 1 : 0, req.user.id, publicNotes ? 1 : 0);
   res.json({
     notes: rows.map(({ liked_by_me, ...n }) => ({
       ...n,
@@ -188,4 +189,13 @@ notesRouter.get('/notes/open', requireAuth, (req, res) => {
       isMine: n.user_id === req.user.id,
     })),
   });
+}
+
+notesRouter.get('/notes/open', requireAuth, (req, res) => sendNoteFeed(req, res, false, true));
+notesRouter.get('/notes/feed', requireAuth, (req, res) => {
+  const { personal = '1', public: publicNotes = '1' } = req.query;
+  if (!['0', '1'].includes(personal) || !['0', '1'].includes(publicNotes)) {
+    return res.status(400).json({ error: 'Некорректный фильтр заметок' });
+  }
+  sendNoteFeed(req, res, personal === '1', publicNotes === '1');
 });
