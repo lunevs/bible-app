@@ -2,15 +2,18 @@
 // Данные готовит scripts/import-bible.mjs из открытого источника (см. README).
 import fs from 'node:fs';
 import path from 'node:path';
-import { paths } from './config.js';
+import { config, paths } from './config.js';
+import { resolveBibleFile } from './bible-files.js';
 
 const cache = new Map();
 const privateRoot = path.join(paths.serverRoot, 'private-bible');
+const persistentRoot = path.join(path.dirname(config.dbPath), 'private-bible');
+const privateFile = (filename) => resolveBibleFile(filename, persistentRoot, privateRoot);
 const editions = [
   { id: 'synodal', name: 'Синодальный перевод (1876)', file: paths.bibleData },
-  { id: 'ibs', name: 'IBS Biblica', file: path.join(privateRoot, 'ibs.json') },
-  { id: 'biblica', name: 'Новый русский перевод (Biblica)', file: path.join(privateRoot, 'biblica.json') },
-  { id: 'rbo', name: 'Современный русский перевод (РБО, 2011)', file: path.join(privateRoot, 'rbo.json') },
+  { id: 'ibs', name: 'IBS Biblica', file: privateFile('ibs.json') },
+  { id: 'biblica', name: 'Новый русский перевод (Biblica)', file: privateFile('biblica.json') },
+  { id: 'rbo', name: 'Современный русский перевод (РБО, 2011)', file: privateFile('rbo.json') },
 ];
 
 export function listTranslations() {
