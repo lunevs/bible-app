@@ -1,6 +1,22 @@
 const quantileEmoji = [128519, 129321, 128515, 128522, 128578, 129300, 129320, 128532, 128549, 128557, 128561, 128564]
   .map((code) => String.fromCodePoint(code));
 
+export function leaderboardGroups(rows) {
+  return {
+    ranked: rows.filter((row) => row.points > 0),
+    waiting: rows.filter((row) => row.points === 0)
+      .sort((a, b) => a.login.localeCompare(b.login, 'ru', { sensitivity: 'base' })),
+  };
+}
+
+export function participantStatus(groups, userId, choice) {
+  if (groups.waiting.some((row) => row.id === userId)) {
+    return { emoji: '🤔', text: 'Зачем откладывать на завтра, если можно начать сегодня?' };
+  }
+  const index = groups.ranked.findIndex((row) => row.id === userId);
+  return index >= 0 && choice != null ? personalRankStatus(index, groups.ranked.length, choice) : null;
+}
+
 const statusPhrases = [
   ['Постоянство - признак мастерства', 'Ежедневный шаг приводит дальше, чем редкий прыжок', 'Кто сеет каждый день, тот жнёт каждый сезон'],
   ['Терпение и труд всё перетрут', 'Кто рано встаёт, тому Бог подаёт', 'Искра разгорелась - держим огонь'],
@@ -23,11 +39,11 @@ export function personalRankStatus(index, total, choice) {
 }
 
 // Позиция начинается с нуля; порядок приходит уже отсортированным с сервера.
-// При числе участников меньше 12 некоторые группы остаются пустыми.
+// При числе участников меньше 12 используем лучшие уровни подряд.
 export function rankBadge(index, total) {
   if (!Number.isInteger(index) || !Number.isInteger(total) || total < 1 || index < 0 || index >= total) {
     throw new RangeError('Некорректная позиция в рейтинге');
   }
-  const group = Math.floor(index * 12 / total);
+  const group = total < quantileEmoji.length ? index : Math.floor(index * quantileEmoji.length / total);
   return { emoji: quantileEmoji[group], quantile: group + 1 };
 }

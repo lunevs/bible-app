@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { rankBadge, personalRankStatus } from '../leaderboard.js';
+import { rankBadge, leaderboardGroups, participantStatus } from '../leaderboard.js';
 import { useAuth } from '../auth.jsx';
 
 export default function LeaderboardPage() {
@@ -37,8 +37,8 @@ export default function LeaderboardPage() {
 
   if (!rows) return <div className="container py-4 text-muted" role="status">{error || 'Загрузка…'}</div>;
 
-  const myIndex = rows.findIndex((r) => r.id === user.id);
-  const personalStatus = myIndex >= 0 && dailyStatus ? personalRankStatus(myIndex, rows.length, dailyStatus.choice) : null;
+  const groups = leaderboardGroups(rows);
+  const personalStatus = participantStatus(groups, user.id, dailyStatus?.choice);
 
   return (
     <div className="container py-3">
@@ -62,37 +62,42 @@ export default function LeaderboardPage() {
         <span>Баллы</span>
       </div>
 
-      {rows.map((r, i) => {
-        const badge = rankBadge(i, rows.length);
-        return (
-        <div key={r.id} className="leader-row">
-          {r.id === user.id ? (
-            <div className="leader-rank leader-emoji" role="img" aria-label={`Группа рейтинга ${badge.quantile} из 12`} title={`Группа рейтинга ${badge.quantile} из 12`}>{badge.emoji}</div>
-          ) : (
-            <div className="leader-rank">{i + 1}</div>
-          )}
-          <div className="leader-member">
-            <div className="leader-name fw-semibold">
-              <span className="leader-login" title={r.login}>{r.login}</span>
-              {r.role === 'admin' && <span className="leader-admin badge text-bg-secondary">админ</span>}
+      {[{ rows: groups.ranked, ranked: true }, { rows: groups.waiting, ranked: false }].map((group) => (
+        <section key={String(group.ranked)} aria-label={group.ranked ? 'Рейтинг участников' : 'Ждут своего понедельника'}>
+          {!group.ranked && group.rows.length > 0 && <h2 className="h6 mt-4 mb-3">Ждут своего понедельника:</h2>}
+          {group.rows.map((r, i) => {
+            const badge = group.ranked ? rankBadge(i, group.rows.length) : null;
+            return (
+            <div key={r.id} className="leader-row">
+              {badge && r.id === user.id ? (
+                <div className="leader-rank leader-emoji" role="img" aria-label={`Группа рейтинга ${badge.quantile} из 12`} title={`Группа рейтинга ${badge.quantile} из 12`}>{badge.emoji}</div>
+              ) : (
+                <div className="leader-rank">{i + 1}</div>
+              )}
+              <div className="leader-member">
+                <div className="leader-name fw-semibold">
+                  <span className="leader-login" title={r.login}>{r.login}</span>
+                  {r.role === 'admin' && <span className="leader-admin badge text-bg-secondary">админ</span>}
+                </div>
+                <div className="leader-details">
+                  <span><i className="leader-dot on-time" aria-hidden="true" />В срок {r.green}</span>
+                  <span><i className="leader-dot late" aria-hidden="true" />Позже {r.blue}</span>
+                  <span>♥ {r.likes}</span>
+                  <span title="Баллы за заметки" aria-label={`Баллы за заметки: ${r.notePoints}`}>
+                    <svg className="leader-note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M6 3h9l4 4v14H6z" />
+                      <path d="M14 3v5h5M9 12h7M9 16h7" />
+                    </svg>
+                    {r.notePoints}
+                  </span>
+                </div>
+              </div>
+              <div className="leader-points">{r.points}</div>
             </div>
-            <div className="leader-details">
-              <span><i className="leader-dot on-time" aria-hidden="true" />В срок {r.green}</span>
-              <span><i className="leader-dot late" aria-hidden="true" />Позже {r.blue}</span>
-              <span>♥ {r.likes}</span>
-              <span title="Баллы за заметки" aria-label={`Баллы за заметки: ${r.notePoints}`}>
-                <svg className="leader-note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M6 3h9l4 4v14H6z" />
-                  <path d="M14 3v5h5M9 12h7M9 16h7" />
-                </svg>
-                {r.notePoints}
-              </span>
-            </div>
-          </div>
-          <div className="leader-points">{r.points}</div>
-        </div>
-        );
-      })}
+            );
+          })}
+        </section>
+      ))}
 
       {!rows.length && <div className="text-muted">Пока нет участников.</div>}
     </div>

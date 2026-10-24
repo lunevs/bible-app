@@ -1,6 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { rankBadge, personalRankStatus } from '../src/leaderboard.js';
+import { rankBadge, personalRankStatus, leaderboardGroups, participantStatus } from '../src/leaderboard.js';
+
+test('нулевые баллы вынесены в алфавитный список и не влияют на уровни рейтинга', () => {
+  const rows = [
+    { id: 1, login: 'Лидер', points: 10 },
+    { id: 2, login: 'Второй', points: 1 },
+    { id: 3, login: 'Яков', points: 0 },
+    { id: 4, login: 'анна', points: 0 },
+    { id: 5, login: 'Борис', points: 0 },
+  ];
+  const groups = leaderboardGroups(rows);
+  assert.deepEqual(groups.ranked.map((r) => r.id), [1, 2]);
+  assert.deepEqual(groups.waiting.map((r) => r.id), [4, 5, 3]);
+  assert.equal(participantStatus(groups, 2, 0).quantile, 2);
+  assert.deepEqual(rows.map((r) => r.id), [1, 2, 3, 4, 5]);
+});
+
+test('при нулевых баллах статус постоянный, в том числе когда все участники с нулём', () => {
+  const groups = leaderboardGroups([{ id: 1, login: 'Анна', points: 0 }]);
+  const expected = { emoji: '🤔', text: 'Зачем откладывать на завтра, если можно начать сегодня?' };
+  for (const choice of [undefined, 0, 1, 2]) assert.deepEqual(participantStatus(groups, 1, choice), expected);
+  assert.equal(participantStatus(groups, 2, 0), null);
+  assert.equal(participantStatus(leaderboardGroups([]), 1, 0), null);
+});
 
 test('12 участников получают все эмодзи в заданном порядке', () => {
   assert.equal(Array.from({ length: 12 }, (_, i) => rankBadge(i, 12).emoji).join(''), '😇🤩😃😊🙂🤔🤨😔😥😭😱😴');
@@ -18,8 +41,12 @@ test('24 участника распределяются по двое, 16 — �
   }
 });
 
-test('при числе участников меньше 12 группы могут быть пустыми', () => {
-  assert.deepEqual(Array.from({ length: 3 }, (_, i) => rankBadge(i, 3).quantile), [1, 5, 9]);
+test('при числе участников меньше 12 используются только лучшие эмодзи подряд', () => {
+  const emojis = Array.from('😇🤩😃😊🙂🤔🤨😔😥😭😱😴');
+  for (let total = 1; total < 12; total++) {
+    assert.deepEqual(Array.from({ length: total }, (_, i) => rankBadge(i, total).emoji), emojis.slice(0, total));
+    assert.equal(personalRankStatus(total - 1, total, 0).quantile, total);
+  }
   assert.throws(() => rankBadge(0, 0), RangeError);
 });
 
