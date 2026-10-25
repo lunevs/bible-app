@@ -5,9 +5,10 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import { config, paths } from './config.js';
-import './db.js';
+import { db } from './db.js';
 import { loadBible, listTranslations } from './bible.js';
-import './plans.js';
+import { loadPlans } from './plans.js';
+import { applyPlanTransition, archiveStageContent } from './plan-transition.js';
 import { attachUser } from './auth.js';
 import { ensureBootstrapAdmin } from './bootstrap-admin.js';
 import { authRouter } from './routes/auth.js';
@@ -76,6 +77,19 @@ app.use((err, _req, res, _next) => {
 });
 
 bootstrapAdmin();
+
+const catalog = loadPlans();
+if (catalog.meta.transitionId) {
+  if (catalog.plans.length !== 1) throw new Error('Переход этапа требует единственного плана');
+  const changed = applyPlanTransition(db, {
+    transitionId: catalog.meta.transitionId,
+    planId: catalog.plans[0].id,
+    startedAt: catalog.meta.startDate,
+  });
+  console.log(`Этап ${catalog.meta.transitionId}: переключено участников — ${changed}.`);
+  const archived = archiveStageContent(db, catalog.meta.transitionId);
+  console.log(`Этап ${catalog.meta.transitionId}: записей перенесено в архив — ${archived}.`);
+}
 
 try {
   loadBible();

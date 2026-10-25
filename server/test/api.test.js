@@ -13,6 +13,8 @@ const dbPath = path.join(os.tmpdir(), `bible-test-${Date.now()}-${process.pid}.d
 // Календарные сценарии должны давать одинаковый результат в любой день запуска.
 mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-19T10:00:00Z') });
 process.env.DB_PATH = dbPath;
+// Регрессии механики смены планов и коротких отрывков на архивном расписании.
+process.env.PLANS_FILE = new URL('../plans-archive/2026-10-19.json', import.meta.url).pathname;
 process.env.PORT = '0';
 process.env.SESSION_SECRET = 'test-secret';
 process.env.ADMIN_LOGIN = 'admin';
@@ -137,7 +139,7 @@ test('выбор плана и предупреждение при смене', 
   assert.equal(changeConfirm.data.user.planId, 'hard');
 });
 
-test('список планов содержит четыре актуальных плана', async () => {
+test('архивный каталог содержит четыре плана для регрессионных сценариев', async () => {
   const c = makeClient();
   await c('POST', '/api/auth/register', { login: 'test_planner', password: '123' });
   const { data } = await c('GET', '/api/plans');

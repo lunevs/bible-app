@@ -87,5 +87,5 @@ export const config = {
 export const paths = {
   serverRoot,
   bibleData: path.join(serverRoot, 'data', 'bible', 'synodal.json'),
-  plansFile: path.resolve(serverRoot, '..', 'plans.json'),
+  plansFile: process.env.PLANS_FILE || path.resolve(serverRoot, '..', 'plans.json'),
 };

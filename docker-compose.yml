@@ -4,11 +4,7 @@
 # Остановка:         docker compose down
 # Сброс базы:        docker compose down -v
 #
-# ВНИМАНИЕ: TEST_PLAN_START ниже — ВРЕМЕННО, только для тестирования.
-# Задана ФИКСИРОВАННАЯ дата (18 окт), чтобы «сегодня» было вторым днём плана
-# и прогресс не терялся. Раньше стояло `today` — оно пересчитывалось каждый день
-# и сдвигало весь план, из-за чего записи прошлых дней перестали совпадать с
-# датами плана. Для обычной работы уберите эту строку (даты возьмутся из plans.json).
+# По умолчанию используются даты из plans.json. TEST_PLAN_START — только для тестов.
 
 services:
   app:
@@ -22,7 +18,7 @@ services:
       ADMIN_LOGIN: ${ADMIN_LOGIN:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Belgrade}
-      TEST_PLAN_START: ${TEST_PLAN_START:-2026-10-18}
+      TEST_PLAN_START: ${TEST_PLAN_START:-}
       # Доступ по обычному HTTP (локальная сеть, http://192.168.x.x): cookie без
       # флага Secure, иначе браузер её отбрасывает и вход «теряется». За HTTPS
       # поставьте COOKIE_SECURE=true.

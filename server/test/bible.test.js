@@ -5,8 +5,11 @@ import { getPlan } from '../src/plans.js';
 import { verseCount, getPassageVerses, getVerse, listTranslations } from '../src/bible.js';
 import { thresholdFor } from '../src/routes/reading.js';
 import { config } from '../src/config.js';
+import { paths } from '../src/config.js';
+// Архивные отрывки сохраняют проверки порога, составных диапазонов и смены планов.
+paths.plansFile = new URL('../plans-archive/2026-10-19.json', import.meta.url).pathname;
 
-test('планы загружаются: lite 30, standard 50, advanced 50, hard 68 записей', () => {
+test('архивные планы загружаются: lite 30, standard 50, advanced 50, hard 68 записей', () => {
   assert.equal(getPlan('lite').days.length, 30);
   assert.equal(getPlan('standard').days.length, 50);
   assert.equal(getPlan('advanced').days.length, 50);
