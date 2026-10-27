@@ -13,6 +13,23 @@ readingRouter.get('/translations', requireAuth, (_req, res) => {
   res.json({ translations: listTranslations() });
 });
 
+readingRouter.get('/verse-comparison', requireAuth, (req, res) => {
+  const { book } = req.query;
+  const chapter = Number(req.query.chapter);
+  const verse = Number(req.query.verse);
+  const verseEnd = req.query.verseEnd == null ? verse : Number(req.query.verseEnd);
+  if (typeof book !== 'string' || !Number.isSafeInteger(chapter) || chapter < 1
+    || !Number.isSafeInteger(verse) || verse < 1 || !Number.isSafeInteger(verseEnd)
+    || verseEnd < verse || !getVerse(book, chapter, verse) || !getVerse(book, chapter, verseEnd)) {
+    return res.status(400).json({ error: 'Некорректная ссылка на стих' });
+  }
+  const ranges = [{ book, startChapter: chapter, endChapter: chapter, startVerse: verse, endVerse: verseEnd }];
+  res.json({ translations: listTranslations().map((translation) => ({
+    ...translation,
+    verses: getPassageVerses(ranges, translation.id),
+  })) });
+});
+
 // Порог активного времени для засчитывания чтения (раздел 6 ТЗ).
 export function thresholdFor(ranges) {
   const n = verseCount(ranges);

@@ -79,6 +79,7 @@ function Reader({ entry, status, setStatus, onChanged, onNoteAdded }) {
   const [actionVerse, setActionVerse] = useState(null); // меню действий по стиху
   const [addVerse, setAddVerse] = useState(null); // окно «Добавить заметку»
   const [askVerse, setAskVerse] = useState(null); // окно «Задать вопрос»
+  const [compareVerse, setCompareVerse] = useState(null);
   const [viewVerse, setViewVerse] = useState(null); // окно «Заметки»
   const [toast, setToast] = useState('');
 
@@ -170,7 +171,7 @@ function Reader({ entry, status, setStatus, onChanged, onNoteAdded }) {
       )}
 
       <p className="text-muted small mb-2">
-        Нажмите на стих, чтобы добавить заметку.
+        Нажмите на стих, чтобы добавить заметку, задать вопрос или сравнить переводы.
       </p>
 
       <div className="verse-groups mb-4">
@@ -240,8 +241,14 @@ function Reader({ entry, status, setStatus, onChanged, onNoteAdded }) {
             setActionVerse(null);
           }}
           onCopy={() => handleCopy(actionVerse)}
+          onCompare={() => {
+            setCompareVerse(actionVerse);
+            setActionVerse(null);
+          }}
         />
       )}
+
+      {compareVerse && <CompareTranslationsModal verse={compareVerse} onClose={() => setCompareVerse(null)} />}
 
       {addVerse && (
         <AddNoteModal
@@ -293,7 +300,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-function ActionSheet({ verse, onClose, onAddNote, onAskQuestion, onCopy }) {
+function ActionSheet({ verse, onClose, onAddNote, onAskQuestion, onCopy, onCompare }) {
   return (
     <div className="sheet-overlay" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -309,6 +316,10 @@ function ActionSheet({ verse, onClose, onAddNote, onAskQuestion, onCopy }) {
           <span className="sheet-action-icon" aria-hidden="true"><span className="sheet-question-icon">?</span></span>
           <span>Задать вопрос</span>
         </button>
+        <button className="sheet-item" onClick={onCompare}>
+          <span className="sheet-action-icon" aria-hidden="true">📖</span>
+          <span>Сравнить переводы</span>
+        </button>
         <button className="sheet-item" onClick={onCopy}>
           <span className="sheet-action-icon" aria-hidden="true">📋</span>
           <span>Копировать</span>
@@ -318,6 +329,49 @@ function ActionSheet({ verse, onClose, onAddNote, onAskQuestion, onCopy }) {
         </button>
       </div>
     </div>
+  );
+}
+
+function CompareTranslationsModal({ verse, onClose }) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState('');
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    setData(null);
+    setError('');
+    const query = new URLSearchParams({ book: verse.book, chapter: verse.chapter, verse: verse.verse,
+      verseEnd: verse.verseEnd || verse.verse });
+    api.get(`/verse-comparison?${query}`).then((result) => {
+      if (active) setData(result);
+    }).catch((e) => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, [verse.book, verse.chapter, verse.verse, verse.verseEnd, attempt]);
+
+  return (
+    <Modal title="Сравнить переводы" onClose={onClose}>
+      <div role="region" aria-label="Сравнение переводов">
+        <div className="text-muted small mb-3">{verseRef(verse)}</div>
+        {!data && !error && <p className="text-muted" role="status">Загрузка переводов…</p>}
+        {error && <div className="alert alert-warning" role="alert">
+          <p>{error}</p>
+          <button className="btn btn-sm btn-outline-secondary" onClick={() => setAttempt((n) => n + 1)}>Повторить</button>
+        </div>}
+        {data?.translations.map((translation) => (
+          <section key={translation.id} className="mb-3">
+            <h2 className="h6">{translation.name}</h2>
+            <div className="modal-verse-text">
+              {translation.verses.length ? translation.verses.map((v) => (
+                <p key={v.verse} className="mb-2">
+                  <span className="text-muted small me-2">{v.verseLabel || v.verse}</span>{v.text}
+                </p>
+              )) : <p className="text-muted mb-0">В этом переводе нет отдельного текста выбранного стиха.</p>}
+            </div>
+          </section>
+        ))}
+      </div>
+    </Modal>
   );
 }
 

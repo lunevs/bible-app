@@ -56,6 +56,28 @@ after(() => {
 
 // --- Регистрация / вход ---
 
+test('сравнение переводов требует входа и возвращает выбранный стих во всех доступных переводах', async () => {
+  const c = makeClient();
+  const url = '/api/verse-comparison?book=Мф&chapter=1&verse=1';
+  assert.equal((await c('GET', url)).status, 401);
+  await c('POST', '/api/auth/register', { login: 'test_comparison', password: '123' });
+  const result = await c('GET', url);
+  assert.equal(result.status, 200);
+  const available = await c('GET', '/api/translations');
+  assert.deepEqual(result.data.translations.map(({ id, name }) => ({ id, name })), available.data.translations);
+  const synodal = result.data.translations.find((t) => t.id === 'synodal');
+  assert.equal(synodal.verses.length, 1);
+  assert.equal(synodal.verses[0].verse, 1);
+  assert.match(synodal.verses[0].text, /Родословие/);
+  const range = await c('GET', `${url}&verseEnd=3`);
+  assert.deepEqual(range.data.translations.find((t) => t.id === 'synodal').verses.map((v) => v.verse), [1, 2, 3]);
+  for (const query of ['book=Нет&chapter=1&verse=1', 'book=Мф&chapter=0&verse=1',
+    'book=Мф&chapter=1&verse=999', 'book=Мф&chapter=1&verse=2&verseEnd=1',
+    'book=Мф&chapter=1.5&verse=1']) {
+    assert.equal((await c('GET', `/api/verse-comparison?${query}`)).status, 400);
+  }
+});
+
 test('регистрация и получение профиля', async () => {
   const c = makeClient();
   const reg = await c('POST', '/api/auth/register', { login: 'test_petr', password: '123' });
