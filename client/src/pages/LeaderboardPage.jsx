@@ -66,7 +66,7 @@ export default function LeaderboardPage() {
         <section key={String(group.ranked)} aria-label={group.ranked ? 'Рейтинг участников' : 'Ждут своего понедельника'}>
           {!group.ranked && group.rows.length > 0 && <h2 className="h6 mt-4 mb-3">Ждут своего понедельника:</h2>}
           {group.rows.map((r, i) => {
-            const badge = group.ranked ? rankBadge(i, group.rows.length) : null;
+            const badge = group.ranked ? rankBadge(groups.scoreRanks.get(r.points), groups.scoreRanks.size) : null;
             return (
             <div key={r.id} className="leader-row">
               {badge && r.id === user.id ? (

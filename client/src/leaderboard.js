@@ -2,8 +2,12 @@ const quantileEmoji = [128519, 129321, 128515, 128522, 128578, 129300, 129320, 1
   .map((code) => String.fromCodePoint(code));
 
 export function leaderboardGroups(rows) {
+  const ranked = rows.filter((row) => row.points > 0).sort((a, b) => b.points - a.points);
+  const scoreRanks = new Map([...new Set(ranked.map((row) => row.points))]
+    .map((points, index) => [points, index]));
   return {
-    ranked: rows.filter((row) => row.points > 0),
+    ranked,
+    scoreRanks,
     waiting: rows.filter((row) => row.points === 0)
       .sort((a, b) => a.login.localeCompare(b.login, 'ru', { sensitivity: 'base' })),
   };
@@ -13,8 +17,9 @@ export function participantStatus(groups, userId, choice) {
   if (groups.waiting.some((row) => row.id === userId)) {
     return { emoji: '🤔', text: 'Зачем откладывать на завтра, если можно начать сегодня?' };
   }
-  const index = groups.ranked.findIndex((row) => row.id === userId);
-  return index >= 0 && choice != null ? personalRankStatus(index, groups.ranked.length, choice) : null;
+  const row = groups.ranked.find((row) => row.id === userId);
+  return row && choice != null
+    ? personalRankStatus(groups.scoreRanks.get(row.points), groups.scoreRanks.size, choice) : null;
 }
 
 const statusPhrases = [
@@ -38,8 +43,8 @@ export function personalRankStatus(index, total, choice) {
   return { ...badge, text: statusPhrases[badge.quantile - 1][choice] };
 }
 
-// Позиция начинается с нуля; порядок приходит уже отсортированным с сервера.
-// При числе участников меньше 12 используем лучшие уровни подряд.
+// Индекс группы баллов начинается с нуля, от наибольших баллов к наименьшим.
+// При числе групп меньше 12 используем лучшие уровни подряд.
 export function rankBadge(index, total) {
   if (!Number.isInteger(index) || !Number.isInteger(total) || total < 1 || index < 0 || index >= total) {
     throw new RangeError('Некорректная позиция в рейтинге');

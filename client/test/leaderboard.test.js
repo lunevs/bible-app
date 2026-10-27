@@ -2,6 +2,35 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { rankBadge, personalRankStatus, leaderboardGroups, participantStatus } from '../src/leaderboard.js';
 
+test('одинаковые баллы получают одинаковый уровень независимо от порядка и размера группы', () => {
+  const rows = [
+    { id: 1, points: 5 },
+    { id: 2, points: 10 },
+    { id: 3, points: 5 },
+    { id: 4, points: 1 },
+    { id: 5, points: 10 },
+  ];
+  const groups = leaderboardGroups(rows);
+  assert.deepEqual(groups.ranked.map((r) => r.id), [2, 5, 1, 3, 4]);
+  assert.deepEqual(rows.map((r) => r.id), [1, 2, 3, 4, 5]);
+  assert.deepEqual(rows.map((r) => participantStatus(groups, r.id, 0).emoji), ['🤩', '😇', '🤩', '😃', '😇']);
+  assert.deepEqual(participantStatus(groups, 1, 0), participantStatus(groups, 3, 0));
+});
+
+test('если все баллы равны, все участники получают ангелка', () => {
+  const rows = Array.from({ length: 24 }, (_, id) => ({ id, points: 10 }));
+  const groups = leaderboardGroups(rows);
+  for (const row of rows) assert.equal(participantStatus(groups, row.id, 0).emoji, '😇');
+});
+
+test('при числе групп больше 12 распределение зависит от групп, а не числа участников', () => {
+  const rows = Array.from({ length: 24 }, (_, id) => ({ id, points: 24 - id }));
+  const groups = leaderboardGroups([...rows, ...Array.from({ length: 30 }, (_, i) => ({ id: 24 + i, points: 24 }))]);
+  for (const row of rows) {
+    assert.equal(participantStatus(groups, row.id, 0).emoji, rankBadge(row.id, 24).emoji);
+  }
+});
+
 test('нулевые баллы вынесены в алфавитный список и не влияют на уровни рейтинга', () => {
   const rows = [
     { id: 1, login: 'Лидер', points: 10 },
